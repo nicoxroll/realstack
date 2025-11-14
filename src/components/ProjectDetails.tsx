@@ -26,7 +26,6 @@ export default function ProjectDetails({
   const [isFavorite, setIsFavorite] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const { showNotification, NotificationComponent } = useNotification();
 
   // Crear array de imágenes para el carrusel (imagen principal + adicionales)
@@ -44,23 +43,13 @@ export default function ProjectDetails({
     if (carouselImages.length <= 1) return;
 
     const interval = setInterval(() => {
-      handleImageChange((prev) =>
+      setCurrentImageIndex((prev) =>
         prev === carouselImages.length - 1 ? 0 : prev + 1
       );
     }, 5000);
 
     return () => clearInterval(interval);
   }, [carouselImages.length]);
-
-  const handleImageChange = (
-    indexOrFunc: number | ((prev: number) => number)
-  ) => {
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentImageIndex(indexOrFunc);
-      setTimeout(() => setIsTransitioning(false), 50);
-    }, 300);
-  };
 
   const checkFavoriteStatus = async () => {
     const {
@@ -132,36 +121,41 @@ export default function ProjectDetails({
         </button>
 
         <div className="relative aspect-[21/9] w-full overflow-hidden">
-          <img
-            src={carouselImages[currentImageIndex]}
-            alt={project.name}
-            className={`h-full w-full object-cover transition-all duration-700 ease-in-out ${
-              isTransitioning ? "opacity-0 scale-105" : "opacity-100 scale-100"
-            }`}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          {/* Renderizar todas las imágenes con opacidad controlada */}
+          {carouselImages.map((img, idx) => (
+            <img
+              key={idx}
+              src={img}
+              alt={`${project.name} ${idx + 1}`}
+              loading={idx === 0 ? "eager" : "lazy"}
+              className={`carousel-image ${
+                idx === currentImageIndex ? "active" : ""
+              }`}
+            />
+          ))}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-20" />
 
           {/* Flechas de navegación */}
           {carouselImages.length > 1 && (
             <>
               <button
                 onClick={() =>
-                  handleImageChange((prev) =>
+                  setCurrentImageIndex((prev) =>
                     prev === 0 ? carouselImages.length - 1 : prev - 1
                   )
                 }
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 p-3 backdrop-blur-sm transition-all hover:bg-white/40 hover:scale-110"
+                className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/20 p-3 backdrop-blur-sm transition-all hover:bg-white/40 hover:scale-110"
                 aria-label="Imagen anterior"
               >
                 <ChevronLeft className="h-6 w-6 text-white" strokeWidth={1.5} />
               </button>
               <button
                 onClick={() =>
-                  handleImageChange((prev) =>
+                  setCurrentImageIndex((prev) =>
                     prev === carouselImages.length - 1 ? 0 : prev + 1
                   )
                 }
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 p-3 backdrop-blur-sm transition-all hover:bg-white/40 hover:scale-110"
+                className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/20 p-3 backdrop-blur-sm transition-all hover:bg-white/40 hover:scale-110"
                 aria-label="Imagen siguiente"
               >
                 <ChevronRight
@@ -174,12 +168,12 @@ export default function ProjectDetails({
 
           {/* Indicadores del carrusel */}
           {carouselImages.length > 1 && (
-            <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2">
+            <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-2">
               {carouselImages.map((_, idx) => (
                 <button
                   key={idx}
-                  onClick={() => handleImageChange(idx)}
-                  className={`h-2 rounded-full transition-all duration-300 ${
+                  onClick={() => setCurrentImageIndex(idx)}
+                  className={`h-2 rounded-full transition-all duration-500 ${
                     idx === currentImageIndex
                       ? "w-8 bg-white"
                       : "w-2 bg-white/50 hover:bg-white/75"

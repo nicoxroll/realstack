@@ -260,55 +260,6 @@ export default function ProjectLanding({
             <ChevronLeft className="h-5 w-5" strokeWidth={1.5} />
             VOLVER
           </button>
-
-          {/* Menú de navegación central */}
-          <div className="hidden md:flex items-center gap-8">
-            <button
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className={`text-sm font-light tracking-wider transition-colors ${
-                scrollY > 100
-                  ? "text-neutral-600 hover:text-neutral-900"
-                  : "text-white/90 hover:text-white"
-              }`}
-            >
-              INICIO
-            </button>
-            <button
-              onClick={() => {
-                onClose();
-                setTimeout(() => {
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }, 100);
-              }}
-              className={`text-sm font-light tracking-wider transition-colors ${
-                scrollY > 100
-                  ? "text-neutral-600 hover:text-neutral-900"
-                  : "text-white/90 hover:text-white"
-              }`}
-            >
-              PROYECTOS
-            </button>
-            <button
-              onClick={() => {
-                onClose();
-                setTimeout(() => {
-                  const element = document.getElementById("nosotros");
-                  if (element) {
-                    element.scrollIntoView({ behavior: "smooth" });
-                  }
-                }, 100);
-              }}
-              className={`text-sm font-light tracking-wider transition-colors ${
-                scrollY > 100
-                  ? "text-neutral-600 hover:text-neutral-900"
-                  : "text-white/90 hover:text-white"
-              }`}
-            >
-              NOSOTROS
-            </button>
-          </div>
-
-          <div className="w-20" />
         </div>
       </header>
 
@@ -811,10 +762,8 @@ export default function ProjectLanding({
             onClick={() => {
               onClose();
               setTimeout(() => {
-                document
-                  .getElementById("contact")
-                  ?.scrollIntoView({ behavior: "smooth" });
-              }, 100);
+                document.getElementById("contact")?.scrollIntoView();
+              }, 300);
             }}
             className="border border-white bg-white px-12 py-4 text-sm font-light tracking-wider text-neutral-900 transition-all hover:bg-transparent hover:text-white"
           >

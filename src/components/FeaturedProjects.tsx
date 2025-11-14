@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Project } from '../lib/supabase';
+import { useState } from "react";
+import { Project } from "../lib/supabase";
 
 interface FeaturedProjectsProps {
   projects: Project[];
@@ -7,11 +7,18 @@ interface FeaturedProjectsProps {
   onViewDetails: (id: string) => void;
 }
 
-export default function FeaturedProjects({ projects, onViewAll, onViewDetails }: FeaturedProjectsProps) {
+export default function FeaturedProjects({
+  projects,
+  onViewAll,
+  onViewDetails,
+}: FeaturedProjectsProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   return (
-    <section className="bg-neutral-50 px-6 py-24 md:px-12 lg:px-24">
+    <section
+      id="featured-projects"
+      className="bg-neutral-50 px-6 py-24 md:px-12 lg:px-24 scroll-mt-20"
+    >
       <div className="mx-auto max-w-7xl">
         <div className="mb-16 text-center">
           <h2 className="mb-4 text-4xl font-light tracking-wide text-neutral-900 md:text-5xl">
@@ -37,7 +44,7 @@ export default function FeaturedProjects({ projects, onViewAll, onViewDetails }:
 
               <div
                 className={`absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent transition-opacity duration-500 ${
-                  hoveredId === project.id ? 'opacity-100' : 'opacity-0'
+                  hoveredId === project.id ? "opacity-100" : "opacity-0"
                 }`}
               />
 
@@ -48,7 +55,9 @@ export default function FeaturedProjects({ projects, onViewAll, onViewDetails }:
 
                 <div
                   className={`overflow-hidden transition-all duration-500 ${
-                    hoveredId === project.id ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
+                    hoveredId === project.id
+                      ? "max-h-40 opacity-100"
+                      : "max-h-0 opacity-0"
                   }`}
                 >
                   <p className="mb-1 text-sm font-light text-white/80">

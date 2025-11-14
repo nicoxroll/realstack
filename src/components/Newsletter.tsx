@@ -1,72 +1,54 @@
-import { useState, useEffect } from 'react';
-import { Send, Check } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { Check, Send } from "lucide-react";
+import { useState } from "react";
+import { supabase } from "../lib/supabase";
 
 export default function Newsletter() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitMessage, setSubmitMessage] = useState('');
-  const [scrollY, setScrollY] = useState(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const section = document.getElementById('newsletter');
-      if (section) {
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.offsetHeight;
-        const scrollPosition = window.scrollY;
-        
-        if (scrollPosition > sectionTop - window.innerHeight && 
-            scrollPosition < sectionTop + sectionHeight) {
-          setScrollY(scrollPosition - sectionTop + window.innerHeight);
-        }
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  const [submitMessage, setSubmitMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setSubmitMessage('');
+    setSubmitMessage("");
 
     try {
-      const { error } = await supabase.from('clients').insert([{
-        email,
-        name: 'Suscriptor Newsletter',
-        phone: '',
-        message: 'Suscripción a newsletter'
-      }]);
+      const { error } = await supabase.from("clients").insert([
+        {
+          email,
+          name: "Suscriptor Newsletter",
+          phone: "",
+          message: "Suscripción a newsletter",
+        },
+      ]);
 
       if (error) throw error;
 
-      setSubmitMessage('¡Gracias por suscribirte! Pronto recibirás nuestras novedades.');
-      setEmail('');
+      setSubmitMessage(
+        "¡Gracias por suscribirte! Pronto recibirás nuestras novedades."
+      );
+      setEmail("");
     } catch (error) {
-      setSubmitMessage('Error al suscribirse. Por favor intente nuevamente.');
-      console.error('Error:', error);
+      setSubmitMessage("Error al suscribirse. Por favor intente nuevamente.");
+      console.error("Error:", error);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const parallaxOffset = scrollY * 0.5;
-
   return (
     <section id="newsletter" className="relative h-[500px] overflow-hidden">
       {/* Imagen de fondo con parallax */}
       <div
-        className="absolute inset-0 bg-cover bg-center"
+        className="absolute inset-0 w-full h-full"
         style={{
-          backgroundImage: 'url(https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=1920)',
-          transform: `translateY(${parallaxOffset}px)`,
-          scale: '1.1',
+          backgroundImage:
+            "url(https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=1920)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
         }}
       />
-      
+
       {/* Overlay oscuro */}
       <div className="absolute inset-0 bg-black/60" />
 
@@ -99,7 +81,7 @@ export default function Newsletter() {
                 className="flex items-center justify-center gap-2 border border-white bg-white px-8 py-4 font-light tracking-wider text-neutral-900 transition-all hover:bg-transparent hover:text-white disabled:opacity-50"
               >
                 {isSubmitting ? (
-                  'ENVIANDO...'
+                  "ENVIANDO..."
                 ) : (
                   <>
                     SUSCRIBIRSE
@@ -112,12 +94,12 @@ export default function Newsletter() {
             {submitMessage && (
               <div
                 className={`mt-4 flex items-center justify-center gap-2 rounded-sm p-4 backdrop-blur-md ${
-                  submitMessage.includes('Error')
-                    ? 'bg-red-500/20 text-red-100'
-                    : 'bg-green-500/20 text-green-100'
+                  submitMessage.includes("Error")
+                    ? "bg-red-500/20 text-red-100"
+                    : "bg-green-500/20 text-green-100"
                 }`}
               >
-                {!submitMessage.includes('Error') && (
+                {!submitMessage.includes("Error") && (
                   <Check className="h-5 w-5" strokeWidth={1.5} />
                 )}
                 <p className="text-sm font-light">{submitMessage}</p>

@@ -1,12 +1,35 @@
-import { Facebook, Instagram, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
+import {
+  Facebook,
+  Instagram,
+  Linkedin,
+  Mail,
+  MapPin,
+  Phone,
+} from "lucide-react";
 
 interface FooterProps {
   email: string;
   phone: string;
+  scrollToSection: (sectionId: string) => void;
 }
 
-export default function Footer({ email, phone }: FooterProps) {
+export default function Footer({ email, phone, scrollToSection }: FooterProps) {
   const currentYear = new Date().getFullYear();
+
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLButtonElement>,
+    sectionId: string
+  ) => {
+    e.preventDefault();
+    // Special handling for projects link if needed, for now, it does nothing
+    if (sectionId === "proyectos") {
+      // In a real app, you might want to call a function passed via props
+      // to switch the view to 'all-projects'
+      console.log("Navigate to all projects view");
+      return;
+    }
+    scrollToSection(sectionId);
+  };
 
   return (
     <footer className="bg-neutral-900 px-6 py-12 text-white md:px-12 lg:px-24">
@@ -14,10 +37,12 @@ export default function Footer({ email, phone }: FooterProps) {
         <div className="grid grid-cols-1 gap-12 border-b border-white/10 pb-12 md:grid-cols-2 lg:grid-cols-4">
           {/* Sobre nosotros */}
           <div>
-            <h3 className="mb-6 text-lg font-light tracking-widest">REAL STACK</h3>
+            <h3 className="mb-6 text-lg font-light tracking-widest">
+              REAL STACK
+            </h3>
             <p className="mb-6 font-light leading-relaxed text-white/70">
-              Desarrollamos proyectos inmobiliarios de lujo con más de 15 años de
-              experiencia en el mercado.
+              Desarrollamos proyectos inmobiliarios de lujo con más de 15 años
+              de experiencia en el mercado.
             </p>
             <div className="flex gap-4">
               <a
@@ -51,36 +76,36 @@ export default function Footer({ email, phone }: FooterProps) {
             </h4>
             <ul className="space-y-3">
               <li>
-                <a
-                  href="#inicio"
-                  className="font-light text-white/70 transition-colors hover:text-white"
+                <button
+                  onClick={(e) => handleNavClick(e, "inicio")}
+                  className="font-light text-white/70 transition-colors hover:text-white text-left w-full bg-transparent border-none p-0"
                 >
                   Inicio
-                </a>
+                </button>
               </li>
               <li>
-                <a
-                  href="#proyectos"
-                  className="font-light text-white/70 transition-colors hover:text-white"
+                <button
+                  onClick={(e) => handleNavClick(e, "proyectos")}
+                  className="font-light text-white/70 transition-colors hover:text-white text-left w-full bg-transparent border-none p-0"
                 >
                   Proyectos
-                </a>
+                </button>
               </li>
               <li>
-                <a
-                  href="#nosotros"
-                  className="font-light text-white/70 transition-colors hover:text-white"
+                <button
+                  onClick={(e) => handleNavClick(e, "nosotros")}
+                  className="font-light text-white/70 transition-colors hover:text-white text-left w-full bg-transparent border-none p-0"
                 >
                   Nosotros
-                </a>
+                </button>
               </li>
               <li>
-                <a
-                  href="#contact"
-                  className="font-light text-white/70 transition-colors hover:text-white"
+                <button
+                  onClick={(e) => handleNavClick(e, "contact")}
+                  className="font-light text-white/70 transition-colors hover:text-white text-left w-full bg-transparent border-none p-0"
                 >
                   Contacto
-                </a>
+                </button>
               </li>
             </ul>
           </div>
@@ -92,8 +117,12 @@ export default function Footer({ email, phone }: FooterProps) {
             </h4>
             <ul className="space-y-3">
               <li className="font-light text-white/70">Venta de Propiedades</li>
-              <li className="font-light text-white/70">Asesoría Inmobiliaria</li>
-              <li className="font-light text-white/70">Desarrollo de Proyectos</li>
+              <li className="font-light text-white/70">
+                Asesoría Inmobiliaria
+              </li>
+              <li className="font-light text-white/70">
+                Desarrollo de Proyectos
+              </li>
               <li className="font-light text-white/70">Inversiones</li>
             </ul>
           </div>
@@ -105,7 +134,10 @@ export default function Footer({ email, phone }: FooterProps) {
             </h4>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
-                <Mail className="mt-1 h-4 w-4 text-white/70" strokeWidth={1.5} />
+                <Mail
+                  className="mt-1 h-4 w-4 text-white/70"
+                  strokeWidth={1.5}
+                />
                 <a
                   href={`mailto:${email}`}
                   className="font-light text-white/70 transition-colors hover:text-white"
@@ -114,7 +146,10 @@ export default function Footer({ email, phone }: FooterProps) {
                 </a>
               </li>
               <li className="flex items-start gap-3">
-                <Phone className="mt-1 h-4 w-4 text-white/70" strokeWidth={1.5} />
+                <Phone
+                  className="mt-1 h-4 w-4 text-white/70"
+                  strokeWidth={1.5}
+                />
                 <a
                   href={`tel:${phone}`}
                   className="font-light text-white/70 transition-colors hover:text-white"
@@ -123,10 +158,11 @@ export default function Footer({ email, phone }: FooterProps) {
                 </a>
               </li>
               <li className="flex items-start gap-3">
-                <MapPin className="mt-1 h-4 w-4 text-white/70" strokeWidth={1.5} />
-                <span className="font-light text-white/70">
-                  Ciudad, País
-                </span>
+                <MapPin
+                  className="mt-1 h-4 w-4 text-white/70"
+                  strokeWidth={1.5}
+                />
+                <span className="font-light text-white/70">Ciudad, País</span>
               </li>
             </ul>
           </div>

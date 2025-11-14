@@ -70,26 +70,25 @@ export default function AllProjects({
     (v) => v !== undefined && v !== ""
   ).length;
 
-  const opacity = Math.max(0, 1 - scrollY / 600);
-  const scale = Math.max(0.9, 1 - scrollY / 2000);
+  const parallaxOffset = scrollY * 0.5;
+  const contentOpacity = Math.max(0, 1 - scrollY / 400);
 
   return (
     <>
       {/* Hero con Parallax */}
       <section className="relative h-screen w-full overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center transition-all duration-300"
+          className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage:
               "url(https://images.pexels.com/photos/290595/pexels-photo-290595.jpeg)",
-            opacity,
-            transform: `scale(${scale})`,
+            transform: `translateY(${parallaxOffset}px)`,
           }}
         />
         <div className="absolute inset-0 bg-black/50" />
 
         <div className="relative flex h-full items-center justify-center px-6 text-center">
-          <div className="max-w-4xl" style={{ opacity }}>
+          <div className="max-w-4xl" style={{ opacity: contentOpacity }}>
             <h1 className="mb-6 text-5xl font-light tracking-wide text-white md:text-6xl lg:text-7xl">
               Nuestros Proyectos
             </h1>
@@ -102,10 +101,10 @@ export default function AllProjects({
 
         <button
           onClick={() => {
-            window.scrollTo({ top: 0, behavior: "smooth" });
+            window.scrollTo({ top: 0 });
           }}
           className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce text-white transition-opacity hover:opacity-70"
-          style={{ opacity }}
+          style={{ opacity: contentOpacity }}
         >
           <ChevronDown size={40} strokeWidth={1} />
         </button>

@@ -1,4 +1,4 @@
-import { Home, LogIn, LogOut, User } from "lucide-react";
+import { Home, LogIn, LogOut, Menu, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import About from "./components/About";
 import AllProjects from "./components/AllProjects";
@@ -34,6 +34,7 @@ function App() {
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -117,25 +118,28 @@ function App() {
   };
 
   const scrollToSection = (sectionId: string) => {
-    if (view !== "home") {
-      setView("home");
-    }
-
-    setTimeout(() => {
+    const performScroll = () => {
       const element = document.getElementById(sectionId);
       if (element) {
-        const headerOffset = 80;
-        const elementPosition = element.getBoundingClientRect().top;
-        const offsetPosition =
-          elementPosition + window.pageYOffset - headerOffset;
-
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: "smooth",
-        });
+        // The 'block: "start"' option ensures the top of the element aligns with the top of the viewport, respecting scroll-margin.
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
       }
-    }, 100);
+    };
+
+    if (view !== "home") {
+      setView("home");
+      // Increased timeout to give React more time to render the home page before scrolling.
+      setTimeout(performScroll, 300);
+    } else {
+      performScroll();
+    }
   };
+
+  const handleMobileNavClick = (sectionId: string) => {
+    scrollToSection(sectionId);
+    setIsMenuOpen(false);
+  };
+
   const handleAuthClick = () => {
     if (user) {
       // Si está logueado, ir a su perfil correspondiente
@@ -207,7 +211,7 @@ function App() {
       <div className="min-h-screen bg-white">
         <nav
           className={`fixed top-0 z-40 w-full transition-all duration-300 ${
-            scrollY > 100
+            scrollY > 100 || isMenuOpen
               ? "bg-white/90 backdrop-blur-md shadow-sm"
               : "bg-transparent"
           }`}
@@ -216,7 +220,7 @@ function App() {
             <button
               onClick={() => setView("home")}
               className={`flex items-center gap-2 text-xl font-light tracking-widest transition-colors ${
-                scrollY > 100
+                scrollY > 100 || isMenuOpen
                   ? "text-neutral-900 hover:text-neutral-600"
                   : "text-white hover:text-white/80"
               }`}
@@ -266,7 +270,221 @@ function App() {
                 NOSOTROS
               </button>
             </div>
+            {/* Right side icons & mobile menu button */}
             <div className="flex items-center gap-4">
+              <div className="hidden md:flex items-center gap-4">
+                <button
+                  onClick={handleAuthClick}
+                  className={`flex items-center gap-2 text-sm font-light tracking-wider transition-colors ${
+                    scrollY > 100
+                      ? "text-neutral-600 hover:text-neutral-900"
+                      : "text-white/90 hover:text-white"
+                  }`}
+                >
+                  {user ? (
+                    <>
+                      <User size={18} />
+                      <span>{user.email}</span>
+                    </>
+                  ) : (
+                    <>
+                      <LogIn size={18} />
+                      LOGIN
+                    </>
+                  )}
+                </button>
+
+                {user && (
+                  <button
+                    onClick={async () => {
+                      await supabase.auth.signOut();
+                      setUser(null);
+                      setIsAdmin(false);
+                      setView("home");
+                    }}
+                    className={`flex items-center gap-2 text-sm font-light tracking-wider transition-colors ${
+                      scrollY > 100
+                        ? "text-neutral-600 hover:text-red-600"
+                        : "text-white/90 hover:text-red-400"
+                    }`}
+                  >
+                    <LogOut size={18} />
+                  </button>
+                )}
+              </div>
+              {/* Mobile Menu Button */}
+              <button
+                className="md:hidden"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              >
+                <Menu
+                  className={`h-6 w-6 transition-colors ${
+                    scrollY > 100 || isMenuOpen
+                      ? "text-neutral-900"
+                      : "text-white"
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+          {/* Mobile Menu */}
+          {isMenuOpen && (
+            <div className="absolute left-0 top-full w-full bg-white/95 backdrop-blur-md md:hidden">
+              <div className="flex flex-col items-center space-y-6 py-8">
+                <button
+                  onClick={() => handleMobileNavClick("inicio")}
+                  className="text-lg font-light text-neutral-800"
+                >
+                  INICIO
+                </button>
+                <button
+                  onClick={() => handleMobileNavClick("featured-projects")}
+                  className="text-lg font-light text-neutral-800"
+                >
+                  PROYECTOS
+                </button>
+                <button
+                  onClick={() => handleMobileNavClick("nosotros")}
+                  className="text-lg font-light text-neutral-800"
+                >
+                  NOSOTROS
+                </button>
+                <button
+                  onClick={() => handleMobileNavClick("contact")}
+                  className="text-lg font-light text-neutral-800"
+                >
+                  CONTACTO
+                </button>
+                <div className="w-full border-t border-neutral-200 pt-6 flex flex-col items-center space-y-6">
+                  <button
+                    onClick={() => {
+                      handleAuthClick();
+                      setIsMenuOpen(false);
+                    }}
+                    className="flex items-center gap-2 text-lg font-light text-neutral-800"
+                  >
+                    {user ? (
+                      <>
+                        <User size={20} />
+                        <span>{user.email}</span>
+                      </>
+                    ) : (
+                      <>
+                        <LogIn size={20} />
+                        LOGIN
+                      </>
+                    )}
+                  </button>
+                  {user && (
+                    <button
+                      onClick={async () => {
+                        await supabase.auth.signOut();
+                        setUser(null);
+                        setIsAdmin(false);
+                        setView("home");
+                        setIsMenuOpen(false);
+                      }}
+                      className="flex items-center gap-2 text-lg font-light text-red-600"
+                    >
+                      <LogOut size={20} />
+                      <span>LOGOUT</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </nav>
+
+        <AllProjects projects={projects} onViewDetails={handleViewDetails} />
+
+        {config && (
+          <Footer
+            email={config.contact_email}
+            phone={config.contact_phone}
+            scrollToSection={scrollToSection}
+          />
+        )}
+
+        {selectedProject && (
+          <ProjectDetails
+            project={selectedProject}
+            onClose={() => setSelectedProject(null)}
+            onViewMore={() => handleViewMore(selectedProject.id)}
+          />
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-white">
+      <nav
+        className={`fixed top-0 z-40 w-full transition-all duration-300 ${
+          scrollY > 100 || isMenuOpen
+            ? "bg-white/90 backdrop-blur-md shadow-sm"
+            : "bg-transparent"
+        }`}
+      >
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+          <button
+            onClick={() => setView("home")}
+            className={`flex items-center gap-2 text-xl font-light tracking-widest transition-colors ${
+              scrollY > 100 || isMenuOpen
+                ? "text-neutral-900 hover:text-neutral-600"
+                : "text-white hover:text-white/80"
+            }`}
+          >
+            <Home size={24} />
+            REAL STACK
+          </button>
+
+          <div className="hidden md:flex items-center gap-8">
+            <button
+              onClick={() => scrollToSection("inicio")}
+              className={`text-sm font-light tracking-wider transition-colors ${
+                scrollY > 100
+                  ? "text-neutral-600 hover:text-neutral-900"
+                  : "text-white/90 hover:text-white"
+              }`}
+            >
+              INICIO
+            </button>
+            <button
+              onClick={() => scrollToSection("featured-projects")}
+              className={`text-sm font-light tracking-wider transition-colors ${
+                scrollY > 100
+                  ? "text-neutral-600 hover:text-neutral-900"
+                  : "text-white/90 hover:text-white"
+              }`}
+            >
+              PROYECTOS
+            </button>
+            <button
+              onClick={() => scrollToSection("nosotros")}
+              className={`text-sm font-light tracking-wider transition-colors ${
+                scrollY > 100
+                  ? "text-neutral-600 hover:text-neutral-900"
+                  : "text-white/90 hover:text-white"
+              }`}
+            >
+              NOSOTROS
+            </button>
+            <button
+              onClick={() => scrollToSection("contact")}
+              className={`text-sm font-light tracking-wider transition-colors ${
+                scrollY > 100
+                  ? "text-neutral-600 hover:text-neutral-900"
+                  : "text-white/90 hover:text-white"
+              }`}
+            >
+              CONTACTO
+            </button>
+          </div>
+
+          {/* Right side icons & mobile menu button */}
+          <div className="flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-4">
               <button
                 onClick={handleAuthClick}
                 className={`flex items-center gap-2 text-sm font-light tracking-wider transition-colors ${
@@ -306,126 +524,88 @@ function App() {
                 </button>
               )}
             </div>
-          </div>
-        </nav>
-
-        <AllProjects projects={projects} onViewDetails={handleViewDetails} />
-
-        {config && (
-          <Footer email={config.contact_email} phone={config.contact_phone} />
-        )}
-
-        {selectedProject && (
-          <ProjectDetails
-            project={selectedProject}
-            onClose={() => setSelectedProject(null)}
-            onViewMore={() => handleViewMore(selectedProject.id)}
-          />
-        )}
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-white">
-      <nav
-        className={`fixed top-0 z-40 w-full transition-all duration-300 ${
-          scrollY > 100
-            ? "bg-white/90 backdrop-blur-md shadow-sm"
-            : "bg-transparent"
-        }`}
-      >
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <button
-            onClick={() => setView("home")}
-            className={`flex items-center gap-2 text-xl font-light tracking-widest transition-colors ${
-              scrollY > 100
-                ? "text-neutral-900 hover:text-neutral-600"
-                : "text-white hover:text-white/80"
-            }`}
-          >
-            <Home size={24} />
-            REAL STACK
-          </button>
-
-          {/* Menú de navegación central */}
-          <div className="hidden md:flex items-center gap-8">
+            {/* Mobile Menu Button */}
             <button
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className={`text-sm font-light tracking-wider transition-colors ${
-                scrollY > 100
-                  ? "text-neutral-600 hover:text-neutral-900"
-                  : "text-white/90 hover:text-white"
-              }`}
+              className="md:hidden"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              INICIO
-            </button>
-            <button
-              onClick={() => {
-                window.scrollTo({ top: 0, behavior: "smooth" });
-                setTimeout(() => handleViewAll(), 100);
-              }}
-              className={`text-sm font-light tracking-wider transition-colors ${
-                scrollY > 100
-                  ? "text-neutral-600 hover:text-neutral-900"
-                  : "text-white/90 hover:text-white"
-              }`}
-            >
-              PROYECTOS
-            </button>
-            <button
-              onClick={() => scrollToSection("nosotros")}
-              className={`text-sm font-light tracking-wider transition-colors ${
-                scrollY > 100
-                  ? "text-neutral-600 hover:text-neutral-900"
-                  : "text-white/90 hover:text-white"
-              }`}
-            >
-              NOSOTROS
-            </button>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <button
-              onClick={handleAuthClick}
-              className={`flex items-center gap-2 text-sm font-light tracking-wider transition-colors ${
-                scrollY > 100
-                  ? "text-neutral-600 hover:text-neutral-900"
-                  : "text-white/90 hover:text-white"
-              }`}
-            >
-              {user ? (
-                <>
-                  <User size={18} />
-                  <span>{user.email}</span>
-                </>
-              ) : (
-                <>
-                  <LogIn size={18} />
-                  LOGIN
-                </>
-              )}
-            </button>
-
-            {user && (
-              <button
-                onClick={async () => {
-                  await supabase.auth.signOut();
-                  setUser(null);
-                  setIsAdmin(false);
-                  setView("home");
-                }}
-                className={`flex items-center gap-2 text-sm font-light tracking-wider transition-colors ${
-                  scrollY > 100
-                    ? "text-neutral-600 hover:text-red-600"
-                    : "text-white/90 hover:text-red-400"
+              <Menu
+                className={`h-6 w-6 transition-colors ${
+                  scrollY > 100 || isMenuOpen
+                    ? "text-neutral-900"
+                    : "text-white"
                 }`}
-              >
-                <LogOut size={18} />
-              </button>
-            )}
+              />
+            </button>
           </div>
         </div>
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="absolute left-0 top-full w-full bg-white/95 backdrop-blur-md md:hidden">
+            <div className="flex flex-col items-center space-y-6 py-8">
+              <button
+                onClick={() => handleMobileNavClick("inicio")}
+                className="text-lg font-light text-neutral-800"
+              >
+                INICIO
+              </button>
+              <button
+                onClick={() => handleMobileNavClick("featured-projects")}
+                className="text-lg font-light text-neutral-800"
+              >
+                PROYECTOS
+              </button>
+              <button
+                onClick={() => handleMobileNavClick("nosotros")}
+                className="text-lg font-light text-neutral-800"
+              >
+                NOSOTROS
+              </button>
+              <button
+                onClick={() => handleMobileNavClick("contact")}
+                className="text-lg font-light text-neutral-800"
+              >
+                CONTACTO
+              </button>
+              <div className="w-full border-t border-neutral-200 pt-6 flex flex-col items-center space-y-6">
+                <button
+                  onClick={() => {
+                    handleAuthClick();
+                    setIsMenuOpen(false);
+                  }}
+                  className="flex items-center gap-2 text-lg font-light text-neutral-800"
+                >
+                  {user ? (
+                    <>
+                      <User size={20} />
+                      <span>{user.email}</span>
+                    </>
+                  ) : (
+                    <>
+                      <LogIn size={20} />
+                      LOGIN
+                    </>
+                  )}
+                </button>
+                {user && (
+                  <button
+                    onClick={async () => {
+                      await supabase.auth.signOut();
+                      setUser(null);
+                      setIsAdmin(false);
+                      setView("home");
+                      setIsMenuOpen(false);
+                    }}
+                    className="flex items-center gap-2 text-lg font-light text-red-600"
+                  >
+                    <LogOut size={20} />
+                    <span>LOGOUT</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </nav>
 
       {config && (
@@ -452,7 +632,11 @@ function App() {
             mapsUrl={config.maps_embed_url}
           />
 
-          <Footer email={config.contact_email} phone={config.contact_phone} />
+          <Footer
+            email={config.contact_email}
+            phone={config.contact_phone}
+            scrollToSection={scrollToSection}
+          />
         </>
       )}
 
