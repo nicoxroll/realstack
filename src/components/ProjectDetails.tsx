@@ -52,7 +52,9 @@ export default function ProjectDetails({
     return () => clearInterval(interval);
   }, [carouselImages.length]);
 
-  const handleImageChange = (indexOrFunc: number | ((prev: number) => number)) => {
+  const handleImageChange = (
+    indexOrFunc: number | ((prev: number) => number)
+  ) => {
     setIsTransitioning(true);
     setTimeout(() => {
       setCurrentImageIndex(indexOrFunc);
@@ -134,7 +136,7 @@ export default function ProjectDetails({
             src={carouselImages[currentImageIndex]}
             alt={project.name}
             className={`h-full w-full object-cover transition-all duration-700 ease-in-out ${
-              isTransitioning ? 'opacity-0 scale-105' : 'opacity-100 scale-100'
+              isTransitioning ? "opacity-0 scale-105" : "opacity-100 scale-100"
             }`}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />

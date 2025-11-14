@@ -120,13 +120,14 @@ function App() {
     if (view !== "home") {
       setView("home");
     }
-    
+
     setTimeout(() => {
       const element = document.getElementById(sectionId);
       if (element) {
         const headerOffset = 80;
         const elementPosition = element.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        const offsetPosition =
+          elementPosition + window.pageYOffset - headerOffset;
 
         window.scrollTo({
           top: offsetPosition,
@@ -134,7 +135,8 @@ function App() {
         });
       }
     }, 100);
-  };  const handleAuthClick = () => {
+  };
+  const handleAuthClick = () => {
     if (user) {
       // Si está logueado, ir a su perfil correspondiente
       setView(isAdmin ? "admin" : "profile");
@@ -227,7 +229,10 @@ function App() {
               <button
                 onClick={() => {
                   setView("home");
-                  setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 100);
+                  setTimeout(
+                    () => window.scrollTo({ top: 0, behavior: "smooth" }),
+                    100
+                  );
                 }}
                 className={`text-sm font-light tracking-wider transition-colors ${
                   scrollY > 100
