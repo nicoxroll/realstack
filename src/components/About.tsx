@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from "react";
 
 interface TimelineEvent {
   year: string;
@@ -9,28 +9,36 @@ interface TimelineEvent {
 
 const timelineEvents: TimelineEvent[] = [
   {
-    year: '2010',
-    title: 'Fundación',
-    description: 'Iniciamos nuestro camino en el sector inmobiliario con una visión clara de excelencia.',
-    image: 'https://images.pexels.com/photos/1370704/pexels-photo-1370704.jpeg?auto=compress&cs=tinysrgb&w=800',
+    year: "2010",
+    title: "Fundación",
+    description:
+      "Iniciamos nuestro camino en el sector inmobiliario con una visión clara de excelencia.",
+    image:
+      "https://images.pexels.com/photos/1370704/pexels-photo-1370704.jpeg?auto=compress&cs=tinysrgb&w=800",
   },
   {
-    year: '2015',
-    title: 'Expansión Regional',
-    description: 'Ampliamos nuestra presencia a múltiples ciudades, consolidando nuestro liderazgo.',
-    image: 'https://images.pexels.com/photos/1438832/pexels-photo-1438832.jpeg?auto=compress&cs=tinysrgb&w=800',
+    year: "2015",
+    title: "Expansión Regional",
+    description:
+      "Ampliamos nuestra presencia a múltiples ciudades, consolidando nuestro liderazgo.",
+    image:
+      "https://images.pexels.com/photos/1438832/pexels-photo-1438832.jpeg?auto=compress&cs=tinysrgb&w=800",
   },
   {
-    year: '2020',
-    title: 'Innovación Digital',
-    description: 'Implementamos tecnología de punta para mejorar la experiencia de nuestros clientes.',
-    image: 'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=800',
+    year: "2020",
+    title: "Innovación Digital",
+    description:
+      "Implementamos tecnología de punta para mejorar la experiencia de nuestros clientes.",
+    image:
+      "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=800",
   },
   {
-    year: '2025',
-    title: 'Líderes del Mercado',
-    description: 'Reconocidos como referentes en desarrollo inmobiliario sostenible y de lujo.',
-    image: 'https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=800',
+    year: "2025",
+    title: "Líderes del Mercado",
+    description:
+      "Reconocidos como referentes en desarrollo inmobiliario sostenible y de lujo.",
+    image:
+      "https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=800",
   },
 ];
 
@@ -52,7 +60,7 @@ export default function About() {
         },
         {
           threshold: 0.2,
-          rootMargin: '0px 0px -100px 0px',
+          rootMargin: "0px 0px -100px 0px",
         }
       );
 
@@ -66,7 +74,10 @@ export default function About() {
   }, []);
 
   return (
-    <section id="nosotros" className="bg-white px-6 py-24 md:px-12 lg:px-24">
+    <section
+      id="nosotros"
+      className="bg-white px-6 py-24 md:px-12 lg:px-24 scroll-mt-20"
+    >
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-20 text-center">
@@ -84,30 +95,33 @@ export default function About() {
             </h3>
             <div className="space-y-4 text-lg font-light leading-relaxed text-neutral-700">
               <p>
-                Somos una empresa líder en el sector inmobiliario con más de 15 años de 
-                experiencia en el desarrollo de proyectos residenciales y comerciales de lujo. 
-                Nuestra misión es transformar espacios en hogares y oportunidades de inversión 
-                excepcionales.
+                Somos una empresa líder en el sector inmobiliario con más de 15
+                años de experiencia en el desarrollo de proyectos residenciales
+                y comerciales de lujo. Nuestra misión es transformar espacios en
+                hogares y oportunidades de inversión excepcionales.
               </p>
               <p>
-                Nos especializamos en crear comunidades sostenibles que combinan diseño 
-                arquitectónico innovador, tecnología de vanguardia y un compromiso inquebrantable 
-                con la calidad. Cada proyecto refleja nuestra pasión por la excelencia y nuestra 
-                dedicación a superar las expectativas de nuestros clientes.
+                Nos especializamos en crear comunidades sostenibles que combinan
+                diseño arquitectónico innovador, tecnología de vanguardia y un
+                compromiso inquebrantable con la calidad. Cada proyecto refleja
+                nuestra pasión por la excelencia y nuestra dedicación a superar
+                las expectativas de nuestros clientes.
               </p>
               <p>
-                Con un equipo multidisciplinario de expertos en arquitectura, ingeniería, diseño 
-                y gestión de proyectos, garantizamos que cada desarrollo inmobiliario no solo 
-                cumpla con los más altos estándares de construcción, sino que también ofrezca 
-                un valor excepcional a largo plazo.
+                Con un equipo multidisciplinario de expertos en arquitectura,
+                ingeniería, diseño y gestión de proyectos, garantizamos que cada
+                desarrollo inmobiliario no solo cumpla con los más altos
+                estándares de construcción, sino que también ofrezca un valor
+                excepcional a largo plazo.
               </p>
               <p className="font-medium text-neutral-900">
-                Nuestra visión es ser el referente en desarrollo inmobiliario sostenible, 
-                creando espacios que mejoren la calidad de vida de las personas y comunidades.
+                Nuestra visión es ser el referente en desarrollo inmobiliario
+                sostenible, creando espacios que mejoren la calidad de vida de
+                las personas y comunidades.
               </p>
             </div>
           </div>
-          
+
           <div className="flex items-center">
             <div className="aspect-[4/5] w-full overflow-hidden shadow-2xl">
               <img
@@ -137,8 +151,8 @@ export default function About() {
                 Excelencia
               </h4>
               <p className="font-light text-neutral-600">
-                Nos comprometemos a entregar proyectos que superen los estándares de calidad 
-                y diseño en la industria inmobiliaria.
+                Nos comprometemos a entregar proyectos que superen los
+                estándares de calidad y diseño en la industria inmobiliaria.
               </p>
             </div>
             <div className="text-center">
@@ -153,8 +167,9 @@ export default function About() {
                 Innovación
               </h4>
               <p className="font-light text-neutral-600">
-                Implementamos las últimas tecnologías y tendencias en construcción sostenible 
-                para crear espacios modernos y eficientes.
+                Implementamos las últimas tecnologías y tendencias en
+                construcción sostenible para crear espacios modernos y
+                eficientes.
               </p>
             </div>
             <div className="text-center">
@@ -169,8 +184,8 @@ export default function About() {
                 Confianza
               </h4>
               <p className="font-light text-neutral-600">
-                Construimos relaciones duraderas con nuestros clientes basadas en la 
-                transparencia, honestidad y cumplimiento de promesas.
+                Construimos relaciones duraderas con nuestros clientes basadas
+                en la transparencia, honestidad y cumplimiento de promesas.
               </p>
             </div>
           </div>
@@ -191,18 +206,18 @@ export default function About() {
                   key={event.year}
                   ref={(el) => (timelineRefs.current[index] = el)}
                   className={`relative flex flex-col items-center gap-8 transition-all duration-1000 lg:flex-row ${
-                    index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'
+                    index % 2 === 0 ? "lg:flex-row" : "lg:flex-row-reverse"
                   } ${
                     visibleItems.includes(index)
-                      ? 'translate-y-0 opacity-100'
-                      : 'translate-y-10 opacity-0'
+                      ? "translate-y-0 opacity-100"
+                      : "translate-y-10 opacity-0"
                   }`}
                 >
                   {/* Contenido */}
                   <div className="w-full lg:w-5/12">
                     <div
                       className={`rounded-sm bg-neutral-50 p-6 ${
-                        index % 2 === 0 ? 'lg:text-right' : 'lg:text-left'
+                        index % 2 === 0 ? "lg:text-right" : "lg:text-left"
                       }`}
                     >
                       <div className="mb-2 text-sm font-light tracking-widest text-neutral-400">
@@ -211,7 +226,9 @@ export default function About() {
                       <h4 className="mb-3 text-xl font-light tracking-wide text-neutral-900">
                         {event.title}
                       </h4>
-                      <p className="font-light text-neutral-600">{event.description}</p>
+                      <p className="font-light text-neutral-600">
+                        {event.description}
+                      </p>
                     </div>
                   </div>
 

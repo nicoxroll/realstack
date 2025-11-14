@@ -1,20 +1,19 @@
-import { useState, useEffect, useRef } from 'react';
-import { Project, supabase } from '../lib/supabase';
-import AppointmentCalendar from './AppointmentCalendar';
-import { useNotification } from '../hooks/useNotification';
-import { 
-  MapPin, 
-  Calendar, 
-  Home, 
-  Check, 
-  X, 
-  Maximize2,
+import {
   Bath,
   Bed,
+  Calendar,
+  CalendarClock,
+  Check,
   ChevronLeft,
   Heart,
-  CalendarClock
-} from 'lucide-react';
+  Home,
+  MapPin,
+  Maximize2,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useNotification } from "../hooks/useNotification";
+import { Project, supabase } from "../lib/supabase";
+import AppointmentCalendar from "./AppointmentCalendar";
 
 // Declaración de tipos para Leaflet
 declare global {
@@ -30,26 +29,30 @@ interface ProjectLandingProps {
 
 const defaultGallery = {
   kitchen: [
-    'https://images.pexels.com/photos/2062426/pexels-photo-2062426.jpeg?auto=compress&cs=tinysrgb&w=800',
-    'https://images.pexels.com/photos/1599791/pexels-photo-1599791.jpeg?auto=compress&cs=tinysrgb&w=800',
+    "https://images.pexels.com/photos/2062426/pexels-photo-2062426.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "https://images.pexels.com/photos/1599791/pexels-photo-1599791.jpeg?auto=compress&cs=tinysrgb&w=800",
   ],
   bathroom: [
-    'https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=800',
-    'https://images.pexels.com/photos/1454804/pexels-photo-1454804.jpeg?auto=compress&cs=tinysrgb&w=800',
+    "https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "https://images.pexels.com/photos/1454804/pexels-photo-1454804.jpeg?auto=compress&cs=tinysrgb&w=800",
   ],
   bedroom: [
-    'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=800',
-    'https://images.pexels.com/photos/1743231/pexels-photo-1743231.jpeg?auto=compress&cs=tinysrgb&w=800',
+    "https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "https://images.pexels.com/photos/1743231/pexels-photo-1743231.jpeg?auto=compress&cs=tinysrgb&w=800",
   ],
   living: [
-    'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=800',
-    'https://images.pexels.com/photos/1648776/pexels-photo-1648776.jpeg?auto=compress&cs=tinysrgb&w=800',
+    "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "https://images.pexels.com/photos/1648776/pexels-photo-1648776.jpeg?auto=compress&cs=tinysrgb&w=800",
   ],
 };
 
-const defaultFloorPlan = 'https://images.pexels.com/photos/271667/pexels-photo-271667.jpeg?auto=compress&cs=tinysrgb&w=1200';
+const defaultFloorPlan =
+  "https://images.pexels.com/photos/271667/pexels-photo-271667.jpeg?auto=compress&cs=tinysrgb&w=1200";
 
-export default function ProjectLanding({ projectId, onClose }: ProjectLandingProps) {
+export default function ProjectLanding({
+  projectId,
+  onClose,
+}: ProjectLandingProps) {
   const [project, setProject] = useState<Project | null>(null);
   const [activeTab, setActiveTab] = useState(0);
   const [scrollY, setScrollY] = useState(0);
@@ -70,8 +73,8 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
       setScrollY(window.scrollY);
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [projectId]);
 
   useEffect(() => {
@@ -88,7 +91,7 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
         },
         {
           threshold: 0.2,
-          rootMargin: '0px 0px -100px 0px',
+          rootMargin: "0px 0px -100px 0px",
         }
       );
 
@@ -110,13 +113,13 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
     const loadLeaflet = async () => {
       // @ts-expect-error Leaflet se carga dinámicamente
       if (!window.L) {
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        const link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
         document.head.appendChild(link);
 
-        const script = document.createElement('script');
-        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        const script = document.createElement("script");
+        script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
         await new Promise((resolve) => {
           script.onload = resolve;
           document.head.appendChild(script);
@@ -129,26 +132,31 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
 
       try {
         if (!mapInstanceRef.current && project.latitude && project.longitude) {
-          mapInstanceRef.current = L.map(mapRef.current).setView([project.latitude, project.longitude], 15);
+          mapInstanceRef.current = L.map(mapRef.current).setView(
+            [project.latitude, project.longitude],
+            15
+          );
 
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors',
+          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "© OpenStreetMap contributors",
             maxZoom: 19,
           }).addTo(mapInstanceRef.current);
 
           // Agregar marker por defecto
           L.marker([project.latitude, project.longitude])
             .addTo(mapInstanceRef.current)
-            .bindPopup(`
+            .bindPopup(
+              `
               <div style="min-width: 200px;">
                 <h3 style="margin: 0 0 8px 0; font-size: 14px; font-weight: 500;">${project.name}</h3>
                 <p style="margin: 0; font-size: 12px; color: #666;">${project.location}</p>
               </div>
-            `)
+            `
+            )
             .openPopup();
         }
       } catch (error) {
-        console.error('Error loading map:', error);
+        console.error("Error loading map:", error);
       }
     };
 
@@ -165,25 +173,27 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
 
   const loadProject = async () => {
     const { data } = await supabase
-      .from('projects')
-      .select('*')
-      .eq('id', projectId)
+      .from("projects")
+      .select("*")
+      .eq("id", projectId)
       .single();
-    
+
     if (data) {
       setProject(data);
     }
   };
 
   const checkFavoriteStatus = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (user) {
       setUser(user);
       const { data } = await supabase
-        .from('user_favorites')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('project_id', projectId)
+        .from("user_favorites")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("project_id", projectId)
         .maybeSingle();
       setIsFavorite(!!data);
     }
@@ -191,20 +201,23 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
 
   const toggleFavorite = async () => {
     if (!user) {
-      showNotification('Debes iniciar sesión para agregar favoritos', 'warning');
+      showNotification(
+        "Debes iniciar sesión para agregar favoritos",
+        "warning"
+      );
       return;
     }
 
     if (isFavorite) {
       await supabase
-        .from('user_favorites')
+        .from("user_favorites")
         .delete()
-        .eq('user_id', user.id)
-        .eq('project_id', projectId);
+        .eq("user_id", user.id)
+        .eq("project_id", projectId);
       setIsFavorite(false);
     } else {
       await supabase
-        .from('user_favorites')
+        .from("user_favorites")
         .insert([{ user_id: user.id, project_id: projectId }]);
       setIsFavorite(true);
     }
@@ -218,25 +231,30 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
     );
   }
 
-  const gallery = (project.gallery_images && 
-                  project.gallery_images.bathroom && 
-                  project.gallery_images.bathroom.length > 0) 
-                  ? project.gallery_images 
-                  : defaultGallery;
+  const gallery =
+    project.gallery_images &&
+    project.gallery_images.bathroom &&
+    project.gallery_images.bathroom.length > 0
+      ? project.gallery_images
+      : defaultGallery;
   const unitTypes = project.unit_types || [];
   const opacity = Math.max(0, 1 - scrollY / 600);
 
   return (
     <div className="min-h-screen bg-white">
       {/* Header flotante */}
-      <header className={`fixed top-0 z-50 w-full transition-all duration-300 ${
-        scrollY > 100 ? 'bg-white/90 backdrop-blur-md shadow-sm' : 'bg-transparent'
-      }`}>
+      <header
+        className={`fixed top-0 z-50 w-full transition-all duration-300 ${
+          scrollY > 100
+            ? "bg-white/90 backdrop-blur-md shadow-sm"
+            : "bg-transparent"
+        }`}
+      >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <button
             onClick={onClose}
             className={`flex items-center gap-2 text-sm font-light tracking-wider transition-colors ${
-              scrollY > 100 ? 'text-neutral-900' : 'text-white'
+              scrollY > 100 ? "text-neutral-900" : "text-white"
             }`}
           >
             <ChevronLeft className="h-5 w-5" strokeWidth={1.5} />
@@ -246,9 +264,11 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
           {/* Menú de navegación central */}
           <div className="hidden md:flex items-center gap-8">
             <button
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               className={`text-sm font-light tracking-wider transition-colors ${
-                scrollY > 100 ? 'text-neutral-600 hover:text-neutral-900' : 'text-white/90 hover:text-white'
+                scrollY > 100
+                  ? "text-neutral-600 hover:text-neutral-900"
+                  : "text-white/90 hover:text-white"
               }`}
             >
               INICIO
@@ -257,11 +277,13 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
               onClick={() => {
                 onClose();
                 setTimeout(() => {
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  window.scrollTo({ top: 0, behavior: "smooth" });
                 }, 100);
               }}
               className={`text-sm font-light tracking-wider transition-colors ${
-                scrollY > 100 ? 'text-neutral-600 hover:text-neutral-900' : 'text-white/90 hover:text-white'
+                scrollY > 100
+                  ? "text-neutral-600 hover:text-neutral-900"
+                  : "text-white/90 hover:text-white"
               }`}
             >
               PROYECTOS
@@ -270,14 +292,16 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
               onClick={() => {
                 onClose();
                 setTimeout(() => {
-                  const element = document.getElementById('nosotros');
+                  const element = document.getElementById("nosotros");
                   if (element) {
-                    element.scrollIntoView({ behavior: 'smooth' });
+                    element.scrollIntoView({ behavior: "smooth" });
                   }
                 }, 100);
               }}
               className={`text-sm font-light tracking-wider transition-colors ${
-                scrollY > 100 ? 'text-neutral-600 hover:text-neutral-900' : 'text-white/90 hover:text-white'
+                scrollY > 100
+                  ? "text-neutral-600 hover:text-neutral-900"
+                  : "text-white/90 hover:text-white"
               }`}
             >
               NOSOTROS
@@ -298,7 +322,7 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
           }}
         />
         <div className="absolute inset-0 bg-black/50" />
-        
+
         <div className="relative flex h-full flex-col items-center justify-center px-6 text-center">
           <div style={{ opacity }}>
             <h1 className="mb-6 text-5xl font-light tracking-wide text-white md:text-7xl">
@@ -315,35 +339,39 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
         </div>
 
         {/* Botones flotantes en hero */}
-        <div className="absolute bottom-8 right-8 flex gap-4" style={{ opacity }}>
+        <div
+          className="absolute bottom-8 right-8 flex gap-4"
+          style={{ opacity }}
+        >
           <button
             onClick={() => setShowAppointmentCalendar(true)}
             className="flex items-center gap-2 border border-white bg-white px-6 py-4 text-neutral-900 shadow-lg transition-all hover:bg-neutral-900 hover:text-white"
           >
             <CalendarClock className="h-6 w-6" strokeWidth={1.5} />
-            <span className="text-sm font-light tracking-wider">AGENDAR TURNO</span>
+            <span className="text-sm font-light tracking-wider">
+              AGENDAR TURNO
+            </span>
           </button>
 
-          <button
-            onClick={toggleFavorite}
-            className="p-4 transition-all"
-          >
+          <button onClick={toggleFavorite} className="p-4 transition-all">
             <Heart
               className={`h-6 w-6 ${
-                isFavorite ? 'text-red-500 fill-red-500' : 'text-white'
+                isFavorite ? "text-red-500 fill-red-500" : "text-white"
               }`}
               strokeWidth={1.5}
-              fill={isFavorite ? 'currentColor' : 'none'}
+              fill={isFavorite ? "currentColor" : "none"}
             />
           </button>
         </div>
 
-        <div 
+        <div
           className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce text-white"
           style={{ opacity }}
         >
           <div className="flex flex-col items-center gap-2">
-            <span className="text-sm font-light tracking-wider">DESCUBRE MÁS</span>
+            <span className="text-sm font-light tracking-wider">
+              DESCUBRE MÁS
+            </span>
             <div className="h-12 w-px bg-white/60" />
           </div>
         </div>
@@ -354,21 +382,38 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
         <div className="mx-auto max-w-7xl">
           <div className="mb-16 grid grid-cols-1 gap-8 md:grid-cols-3">
             <div className="text-center">
-              <Home className="mx-auto mb-4 h-12 w-12 text-neutral-400" strokeWidth={1} />
-              <p className="mb-2 text-sm font-light text-neutral-500">Disponibles</p>
+              <Home
+                className="mx-auto mb-4 h-12 w-12 text-neutral-400"
+                strokeWidth={1}
+              />
+              <p className="mb-2 text-sm font-light text-neutral-500">
+                Disponibles
+              </p>
               <p className="text-3xl font-light text-neutral-900">
                 {project.units_available} de {project.total_units}
               </p>
             </div>
             <div className="text-center">
-              <Calendar className="mx-auto mb-4 h-12 w-12 text-neutral-400" strokeWidth={1} />
-              <p className="mb-2 text-sm font-light text-neutral-500">Entrega</p>
-              <p className="text-3xl font-light text-neutral-900">{project.delivery_date}</p>
+              <Calendar
+                className="mx-auto mb-4 h-12 w-12 text-neutral-400"
+                strokeWidth={1}
+              />
+              <p className="mb-2 text-sm font-light text-neutral-500">
+                Entrega
+              </p>
+              <p className="text-3xl font-light text-neutral-900">
+                {project.delivery_date}
+              </p>
             </div>
             <div className="text-center">
-              <Check className="mx-auto mb-4 h-12 w-12 text-neutral-400" strokeWidth={1} />
+              <Check
+                className="mx-auto mb-4 h-12 w-12 text-neutral-400"
+                strokeWidth={1}
+              />
               <p className="mb-2 text-sm font-light text-neutral-500">Estado</p>
-              <p className="text-3xl font-light capitalize text-neutral-900">{project.status}</p>
+              <p className="text-3xl font-light capitalize text-neutral-900">
+                {project.status}
+              </p>
             </div>
           </div>
 
@@ -398,8 +443,8 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
                   ref={(el) => (ambientesRefs.current[0] = el)}
                   className={`relative flex flex-col items-center gap-8 transition-all duration-1000 lg:flex-row ${
                     visibleAmbientes.includes(0)
-                      ? 'translate-y-0 opacity-100'
-                      : 'translate-y-10 opacity-0'
+                      ? "translate-y-0 opacity-100"
+                      : "translate-y-10 opacity-0"
                   }`}
                 >
                   <div className="w-full lg:w-5/12">
@@ -408,8 +453,9 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
                         Baño
                       </h3>
                       <p className="font-light text-neutral-600">
-                        Espacios elegantes con acabados premium, diseñados para tu comodidad 
-                        y relajación diaria. Griferías de primera línea y detalles modernos.
+                        Espacios elegantes con acabados premium, diseñados para
+                        tu comodidad y relajación diaria. Griferías de primera
+                        línea y detalles modernos.
                       </p>
                     </div>
                   </div>
@@ -419,7 +465,10 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
                   <div className="w-full lg:w-5/12">
                     <div className="grid grid-cols-2 gap-2">
                       {gallery.bathroom.slice(0, 2).map((img, idx) => (
-                        <div key={idx} className="aspect-square overflow-hidden shadow-lg">
+                        <div
+                          key={idx}
+                          className="aspect-square overflow-hidden shadow-lg"
+                        >
                           <img
                             src={img}
                             alt={`Baño ${idx + 1}`}
@@ -438,8 +487,8 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
                   ref={(el) => (ambientesRefs.current[1] = el)}
                   className={`relative flex flex-col items-center gap-8 transition-all duration-1000 lg:flex-row-reverse ${
                     visibleAmbientes.includes(1)
-                      ? 'translate-y-0 opacity-100'
-                      : 'translate-y-10 opacity-0'
+                      ? "translate-y-0 opacity-100"
+                      : "translate-y-10 opacity-0"
                   }`}
                 >
                   <div className="w-full lg:w-5/12">
@@ -448,8 +497,9 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
                         Cocina
                       </h3>
                       <p className="font-light text-neutral-600">
-                        Amplios espacios equipados con electrodomésticos de última generación 
-                        y encimeras de calidad. Perfecta para crear momentos inolvidables.
+                        Amplios espacios equipados con electrodomésticos de
+                        última generación y encimeras de calidad. Perfecta para
+                        crear momentos inolvidables.
                       </p>
                     </div>
                   </div>
@@ -459,7 +509,10 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
                   <div className="w-full lg:w-5/12">
                     <div className="grid grid-cols-2 gap-2">
                       {gallery.kitchen.slice(0, 2).map((img, idx) => (
-                        <div key={idx} className="aspect-square overflow-hidden shadow-lg">
+                        <div
+                          key={idx}
+                          className="aspect-square overflow-hidden shadow-lg"
+                        >
                           <img
                             src={img}
                             alt={`Cocina ${idx + 1}`}
@@ -478,8 +531,8 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
                   ref={(el) => (ambientesRefs.current[2] = el)}
                   className={`relative flex flex-col items-center gap-8 transition-all duration-1000 lg:flex-row ${
                     visibleAmbientes.includes(2)
-                      ? 'translate-y-0 opacity-100'
-                      : 'translate-y-10 opacity-0'
+                      ? "translate-y-0 opacity-100"
+                      : "translate-y-10 opacity-0"
                   }`}
                 >
                   <div className="w-full lg:w-5/12">
@@ -488,8 +541,9 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
                         Living
                       </h3>
                       <p className="font-light text-neutral-600">
-                        Sala de estar luminosa y espaciosa, ideal para compartir con familia 
-                        y amigos. Grandes ventanales y diseño abierto que maximiza la luz natural.
+                        Sala de estar luminosa y espaciosa, ideal para compartir
+                        con familia y amigos. Grandes ventanales y diseño
+                        abierto que maximiza la luz natural.
                       </p>
                     </div>
                   </div>
@@ -499,7 +553,10 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
                   <div className="w-full lg:w-5/12">
                     <div className="grid grid-cols-2 gap-2">
                       {gallery.living.slice(0, 2).map((img, idx) => (
-                        <div key={idx} className="aspect-square overflow-hidden shadow-lg">
+                        <div
+                          key={idx}
+                          className="aspect-square overflow-hidden shadow-lg"
+                        >
                           <img
                             src={img}
                             alt={`Living ${idx + 1}`}
@@ -518,8 +575,8 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
                   ref={(el) => (ambientesRefs.current[3] = el)}
                   className={`relative flex flex-col items-center gap-8 transition-all duration-1000 lg:flex-row-reverse ${
                     visibleAmbientes.includes(3)
-                      ? 'translate-y-0 opacity-100'
-                      : 'translate-y-10 opacity-0'
+                      ? "translate-y-0 opacity-100"
+                      : "translate-y-10 opacity-0"
                   }`}
                 >
                   <div className="w-full lg:w-5/12">
@@ -528,8 +585,9 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
                         Habitaciones
                       </h3>
                       <p className="font-light text-neutral-600">
-                        Dormitorios diseñados para el descanso perfecto, con closets amplios 
-                        y acabados que combinan confort y estilo contemporáneo.
+                        Dormitorios diseñados para el descanso perfecto, con
+                        closets amplios y acabados que combinan confort y estilo
+                        contemporáneo.
                       </p>
                     </div>
                   </div>
@@ -539,7 +597,10 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
                   <div className="w-full lg:w-5/12">
                     <div className="grid grid-cols-2 gap-2">
                       {gallery.bedroom.slice(0, 2).map((img, idx) => (
-                        <div key={idx} className="aspect-square overflow-hidden shadow-lg">
+                        <div
+                          key={idx}
+                          className="aspect-square overflow-hidden shadow-lg"
+                        >
                           <img
                             src={img}
                             alt={`Habitación ${idx + 1}`}
@@ -569,8 +630,36 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
                   key={idx}
                   className="flex items-center gap-3 border border-neutral-200 p-4"
                 >
-                  <Check className="h-5 w-5 flex-shrink-0 text-neutral-600" strokeWidth={1.5} />
+                  <Check
+                    className="h-5 w-5 flex-shrink-0 text-neutral-600"
+                    strokeWidth={1.5}
+                  />
                   <span className="font-light text-neutral-900">{amenity}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Galería de imágenes adicionales */}
+      {project.additional_images && project.additional_images.length > 0 && (
+        <section className="bg-neutral-50 px-6 py-24 md:px-12 lg:px-24">
+          <div className="mx-auto max-w-7xl">
+            <h2 className="mb-16 text-center text-4xl font-light tracking-wide text-neutral-900">
+              Galería
+            </h2>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {project.additional_images.map((img, idx) => (
+                <div
+                  key={idx}
+                  className="aspect-[4/3] overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105"
+                >
+                  <img
+                    src={img}
+                    alt={`Galería ${idx + 1}`}
+                    className="h-full w-full object-cover"
+                  />
                 </div>
               ))}
             </div>
@@ -601,8 +690,8 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
             <h2 className="mb-16 text-center text-4xl font-light tracking-wide text-neutral-900">
               Ubicación
             </h2>
-            <div 
-              ref={mapRef} 
+            <div
+              ref={mapRef}
               className="h-96 w-full rounded-lg border border-neutral-200 shadow-2xl"
             />
           </div>
@@ -625,8 +714,8 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
                   onClick={() => setActiveTab(idx)}
                   className={`px-8 py-3 text-sm font-light tracking-wider transition-all ${
                     activeTab === idx
-                      ? 'bg-neutral-900 text-white'
-                      : 'border border-neutral-300 text-neutral-600 hover:border-neutral-900'
+                      ? "bg-neutral-900 text-white"
+                      : "border border-neutral-300 text-neutral-600 hover:border-neutral-900"
                   }`}
                 >
                   {unit.name}
@@ -644,29 +733,49 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
 
                   <div className="mb-8 grid grid-cols-2 gap-8 md:grid-cols-4">
                     <div className="text-center">
-                      <Bed className="mx-auto mb-3 h-10 w-10 text-neutral-400" strokeWidth={1} />
-                      <p className="mb-1 text-sm font-light text-neutral-500">Dormitorios</p>
+                      <Bed
+                        className="mx-auto mb-3 h-10 w-10 text-neutral-400"
+                        strokeWidth={1}
+                      />
+                      <p className="mb-1 text-sm font-light text-neutral-500">
+                        Dormitorios
+                      </p>
                       <p className="text-2xl font-light text-neutral-900">
                         {unitTypes[activeTab].bedrooms}
                       </p>
                     </div>
                     <div className="text-center">
-                      <Bath className="mx-auto mb-3 h-10 w-10 text-neutral-400" strokeWidth={1} />
-                      <p className="mb-1 text-sm font-light text-neutral-500">Baños</p>
+                      <Bath
+                        className="mx-auto mb-3 h-10 w-10 text-neutral-400"
+                        strokeWidth={1}
+                      />
+                      <p className="mb-1 text-sm font-light text-neutral-500">
+                        Baños
+                      </p>
                       <p className="text-2xl font-light text-neutral-900">
                         {unitTypes[activeTab].bathrooms}
                       </p>
                     </div>
                     <div className="text-center">
-                      <Maximize2 className="mx-auto mb-3 h-10 w-10 text-neutral-400" strokeWidth={1} />
-                      <p className="mb-1 text-sm font-light text-neutral-500">Área</p>
+                      <Maximize2
+                        className="mx-auto mb-3 h-10 w-10 text-neutral-400"
+                        strokeWidth={1}
+                      />
+                      <p className="mb-1 text-sm font-light text-neutral-500">
+                        Área
+                      </p>
                       <p className="text-2xl font-light text-neutral-900">
                         {unitTypes[activeTab].area} m²
                       </p>
                     </div>
                     <div className="text-center">
-                      <Home className="mx-auto mb-3 h-10 w-10 text-neutral-400" strokeWidth={1} />
-                      <p className="mb-1 text-sm font-light text-neutral-500">Precio</p>
+                      <Home
+                        className="mx-auto mb-3 h-10 w-10 text-neutral-400"
+                        strokeWidth={1}
+                      />
+                      <p className="mb-1 text-sm font-light text-neutral-500">
+                        Precio
+                      </p>
                       <p className="text-2xl font-light text-neutral-900">
                         ${unitTypes[activeTab].price.toLocaleString()}
                       </p>
@@ -675,8 +784,8 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
 
                   <div className="border-t border-neutral-200 pt-8 text-center">
                     <p className="mb-6 font-light leading-relaxed text-neutral-700">
-                      Unidad perfectamente diseñada con acabados de primera calidad y 
-                      distribución óptima de espacios.
+                      Unidad perfectamente diseñada con acabados de primera
+                      calidad y distribución óptima de espacios.
                     </p>
                     <button className="bg-neutral-900 px-12 py-4 text-sm font-light tracking-wider text-white transition-all hover:bg-neutral-800">
                       CONSULTAR DISPONIBILIDAD
@@ -702,7 +811,9 @@ export default function ProjectLanding({ projectId, onClose }: ProjectLandingPro
             onClick={() => {
               onClose();
               setTimeout(() => {
-                document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+                document
+                  .getElementById("contact")
+                  ?.scrollIntoView({ behavior: "smooth" });
               }, 100);
             }}
             className="border border-white bg-white px-12 py-4 text-sm font-light tracking-wider text-neutral-900 transition-all hover:bg-transparent hover:text-white"

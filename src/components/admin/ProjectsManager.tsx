@@ -1,34 +1,40 @@
-import { useState } from 'react';
-import { supabase, Project } from '../../lib/supabase';
-import { Plus, Edit, Trash2, Save, X } from 'lucide-react';
-import { useNotification } from '../../hooks/useNotification';
-import { useConfirm } from '../../hooks/useConfirm';
-import MapPicker from './MapPicker';
+import { Edit, Plus, Save, Trash2, X } from "lucide-react";
+import { useState } from "react";
+import { useConfirm } from "../../hooks/useConfirm";
+import { useNotification } from "../../hooks/useNotification";
+import { Project, supabase } from "../../lib/supabase";
+import MapPicker from "./MapPicker";
 
 interface ProjectsManagerProps {
   projects: Project[];
   onUpdate: () => void;
 }
 
-export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerProps) {
+export default function ProjectsManager({
+  projects,
+  onUpdate,
+}: ProjectsManagerProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [editingProject, setEditingProject] = useState<Partial<Project> | null>(null);
+  const [editingProject, setEditingProject] = useState<Partial<Project> | null>(
+    null
+  );
   const { showNotification, NotificationComponent } = useNotification();
   const { confirm, ConfirmComponent } = useConfirm();
 
   const handleCreate = () => {
     setEditingProject({
-      name: '',
-      description: '',
-      location: '',
-      image_url: '',
+      name: "",
+      description: "",
+      location: "",
+      image_url: "",
       price_from: 0,
       units_available: 0,
       total_units: 0,
-      delivery_date: '',
+      delivery_date: "",
       amenities: [],
       is_featured: false,
-      status: 'available',
+      status: "available",
+      additional_images: [],
     });
     setIsEditing(true);
   };
@@ -44,40 +50,43 @@ export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerP
     try {
       if (editingProject.id) {
         const { error } = await supabase
-          .from('projects')
+          .from("projects")
           .update(editingProject)
-          .eq('id', editingProject.id);
+          .eq("id", editingProject.id);
         if (error) throw error;
-        showNotification('Proyecto actualizado correctamente', 'success');
+        showNotification("Proyecto actualizado correctamente", "success");
       } else {
-        const { error } = await supabase.from('projects').insert([editingProject]);
+        const { error } = await supabase
+          .from("projects")
+          .insert([editingProject]);
         if (error) throw error;
-        showNotification('Proyecto creado correctamente', 'success');
+        showNotification("Proyecto creado correctamente", "success");
       }
       setIsEditing(false);
       setEditingProject(null);
       onUpdate();
     } catch (error) {
-      console.error('Error saving project:', error);
-      showNotification('Error al guardar proyecto', 'error');
+      console.error("Error saving project:", error);
+      showNotification("Error al guardar proyecto", "error");
     }
   };
 
   const handleDelete = async (id: string) => {
     const confirmed = await confirm({
-      message: '¿Está seguro de eliminar este proyecto? Esta acción no se puede deshacer.'
+      message:
+        "¿Está seguro de eliminar este proyecto? Esta acción no se puede deshacer.",
     });
-    
+
     if (!confirmed) return;
 
     try {
-      const { error } = await supabase.from('projects').delete().eq('id', id);
+      const { error } = await supabase.from("projects").delete().eq("id", id);
       if (error) throw error;
-      showNotification('Proyecto eliminado correctamente', 'success');
+      showNotification("Proyecto eliminado correctamente", "success");
       onUpdate();
     } catch (error) {
-      console.error('Error deleting project:', error);
-      showNotification('Error al eliminar proyecto', 'error');
+      console.error("Error deleting project:", error);
+      showNotification("Error al eliminar proyecto", "error");
     }
   };
 
@@ -86,7 +95,7 @@ export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerP
       <div className="rounded-lg bg-white p-6 shadow-sm">
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-2xl font-light tracking-wide">
-            {editingProject.id ? 'Editar Proyecto' : 'Nuevo Proyecto'}
+            {editingProject.id ? "Editar Proyecto" : "Nuevo Proyecto"}
           </h2>
           <button
             onClick={() => {
@@ -108,7 +117,7 @@ export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerP
               <input
                 type="text"
                 required
-                value={editingProject.name || ''}
+                value={editingProject.name || ""}
                 onChange={(e) =>
                   setEditingProject({ ...editingProject, name: e.target.value })
                 }
@@ -123,9 +132,12 @@ export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerP
               <input
                 type="text"
                 required
-                value={editingProject.location || ''}
+                value={editingProject.location || ""}
                 onChange={(e) =>
-                  setEditingProject({ ...editingProject, location: e.target.value })
+                  setEditingProject({
+                    ...editingProject,
+                    location: e.target.value,
+                  })
                 }
                 className="w-full border border-neutral-300 px-4 py-2 focus:border-neutral-900 focus:outline-none"
               />
@@ -138,9 +150,12 @@ export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerP
             </label>
             <textarea
               required
-              value={editingProject.description || ''}
+              value={editingProject.description || ""}
               onChange={(e) =>
-                setEditingProject({ ...editingProject, description: e.target.value })
+                setEditingProject({
+                  ...editingProject,
+                  description: e.target.value,
+                })
               }
               rows={3}
               className="w-full border border-neutral-300 px-4 py-2 focus:border-neutral-900 focus:outline-none"
@@ -154,13 +169,40 @@ export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerP
             <input
               type="url"
               required
-              value={editingProject.image_url || ''}
+              value={editingProject.image_url || ""}
               onChange={(e) =>
-                setEditingProject({ ...editingProject, image_url: e.target.value })
+                setEditingProject({
+                  ...editingProject,
+                  image_url: e.target.value,
+                })
               }
               className="w-full border border-neutral-300 px-4 py-2 focus:border-neutral-900 focus:outline-none"
               placeholder="https://ejemplo.com/imagen.jpg"
             />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-light text-neutral-700">
+              Imágenes Adicionales (URLs separadas por coma)
+            </label>
+            <textarea
+              value={editingProject.additional_images?.join(", ") || ""}
+              onChange={(e) =>
+                setEditingProject({
+                  ...editingProject,
+                  additional_images: e.target.value
+                    .split(",")
+                    .map((url) => url.trim())
+                    .filter((url) => url.length > 0),
+                })
+              }
+              rows={3}
+              className="w-full border border-neutral-300 px-4 py-2 focus:border-neutral-900 focus:outline-none"
+              placeholder="https://ejemplo.com/img1.jpg, https://ejemplo.com/img2.jpg, ..."
+            />
+            <p className="mt-1 text-xs font-light text-neutral-500">
+              Estas imágenes se mostrarán en la galería del proyecto
+            </p>
           </div>
 
           <div className="grid grid-cols-3 gap-4">
@@ -224,7 +266,7 @@ export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerP
               <input
                 type="text"
                 required
-                value={editingProject.delivery_date || ''}
+                value={editingProject.delivery_date || ""}
                 onChange={(e) =>
                   setEditingProject({
                     ...editingProject,
@@ -241,9 +283,12 @@ export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerP
                 Estado
               </label>
               <select
-                value={editingProject.status || 'available'}
+                value={editingProject.status || "available"}
                 onChange={(e) =>
-                  setEditingProject({ ...editingProject, status: e.target.value })
+                  setEditingProject({
+                    ...editingProject,
+                    status: e.target.value,
+                  })
                 }
                 className="w-full border border-neutral-300 px-4 py-2 focus:border-neutral-900 focus:outline-none"
               >
@@ -259,7 +304,8 @@ export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerP
               Ubicación en Mapa (opcional)
             </label>
             <p className="mb-3 text-xs font-light text-neutral-500">
-              Busca una dirección o haz click en el mapa para seleccionar la ubicación
+              Busca una dirección o haz click en el mapa para seleccionar la
+              ubicación
             </p>
             <MapPicker
               latitude={editingProject.latitude}
@@ -283,7 +329,7 @@ export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerP
               <input
                 type="number"
                 step="0.000001"
-                value={editingProject.latitude || ''}
+                value={editingProject.latitude || ""}
                 readOnly
                 className="w-full border border-neutral-300 bg-neutral-50 px-4 py-2 text-neutral-600"
                 placeholder="Se actualiza automáticamente"
@@ -297,7 +343,7 @@ export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerP
               <input
                 type="number"
                 step="0.000001"
-                value={editingProject.longitude || ''}
+                value={editingProject.longitude || ""}
                 readOnly
                 className="w-full border border-neutral-300 bg-neutral-50 px-4 py-2 text-neutral-600"
                 placeholder="Se actualiza automáticamente"
@@ -311,11 +357,11 @@ export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerP
             </label>
             <input
               type="text"
-              value={editingProject.amenities?.join(', ') || ''}
+              value={editingProject.amenities?.join(", ") || ""}
               onChange={(e) =>
                 setEditingProject({
                   ...editingProject,
-                  amenities: e.target.value.split(',').map((a) => a.trim()),
+                  amenities: e.target.value.split(",").map((a) => a.trim()),
                 })
               }
               className="w-full border border-neutral-300 px-4 py-2 focus:border-neutral-900 focus:outline-none"
@@ -335,7 +381,10 @@ export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerP
               }
               className="h-4 w-4"
             />
-            <label htmlFor="featured" className="text-sm font-light text-neutral-700">
+            <label
+              htmlFor="featured"
+              className="text-sm font-light text-neutral-700"
+            >
               Destacado en página principal
             </label>
           </div>
@@ -418,7 +467,7 @@ export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerP
                 </td>
                 <td className="py-4 text-sm font-light">{project.status}</td>
                 <td className="py-4 text-sm font-light">
-                  {project.is_featured ? 'Sí' : 'No'}
+                  {project.is_featured ? "Sí" : "No"}
                 </td>
                 <td className="py-4 text-right">
                   <button
@@ -431,7 +480,10 @@ export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerP
                     onClick={() => handleDelete(project.id)}
                     className="p-2 hover:bg-red-50"
                   >
-                    <Trash2 className="h-4 w-4 text-red-600" strokeWidth={1.5} />
+                    <Trash2
+                      className="h-4 w-4 text-red-600"
+                      strokeWidth={1.5}
+                    />
                   </button>
                 </td>
               </tr>
