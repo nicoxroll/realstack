@@ -4,10 +4,12 @@ import ProjectsManager from '../components/admin/ProjectsManager';
 import ClientsManager from '../components/admin/ClientsManager';
 import OperationsManager from '../components/admin/OperationsManager';
 import ConfigManager from '../components/admin/ConfigManager';
+import UsersManager from '../components/admin/UsersManager';
+import AppointmentsManager from '../components/admin/AppointmentsManager';
 import Login from './Login';
-import { Building2, Users, FileText, Settings, Home, LogOut } from 'lucide-react';
+import { Building2, Users, FileText, Settings, Home, LogOut, UserCog, CalendarClock } from 'lucide-react';
 
-type Tab = 'projects' | 'clients' | 'operations' | 'config';
+type Tab = 'projects' | 'clients' | 'operations' | 'config' | 'users' | 'appointments';
 
 interface AdminProps {
   onBackToHome: () => void;
@@ -15,6 +17,7 @@ interface AdminProps {
 
 export default function Admin({ onBackToHome }: AdminProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>('projects');
   const [projects, setProjects] = useState<Project[]>([]);
@@ -28,11 +31,24 @@ export default function Admin({ onBackToHome }: AdminProps) {
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     setIsAuthenticated(!!session);
-    setIsCheckingAuth(false);
     
     if (session) {
-      loadData();
+      // Verificar si el usuario es admin
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+      
+      const userIsAdmin = roleData?.role === 'admin';
+      setIsAdmin(userIsAdmin);
+      
+      if (userIsAdmin) {
+        loadData();
+      }
     }
+    
+    setIsCheckingAuth(false);
   };
 
   const handleLogout = async () => {
@@ -56,6 +72,8 @@ export default function Admin({ onBackToHome }: AdminProps) {
     { id: 'projects' as Tab, label: 'Proyectos', icon: Building2 },
     { id: 'clients' as Tab, label: 'Clientes', icon: Users },
     { id: 'operations' as Tab, label: 'Operaciones', icon: FileText },
+    { id: 'appointments' as Tab, label: 'Turnos', icon: CalendarClock },
+    { id: 'users' as Tab, label: 'Usuarios', icon: UserCog },
     { id: 'config' as Tab, label: 'Configuración', icon: Settings },
   ];
 
@@ -74,8 +92,30 @@ export default function Admin({ onBackToHome }: AdminProps) {
   if (!isAuthenticated) {
     return <Login onLoginSuccess={() => {
       setIsAuthenticated(true);
-      loadData();
+      checkAuth();
     }} />;
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-neutral-50">
+        <div className="max-w-md rounded-lg border border-red-200 bg-white p-8 text-center shadow-lg">
+          <div className="mb-4 text-6xl">🚫</div>
+          <h2 className="mb-2 text-2xl font-light tracking-wide text-neutral-900">
+            Acceso Denegado
+          </h2>
+          <p className="mb-6 font-light text-neutral-600">
+            No tienes permisos de administrador para acceder a esta página.
+          </p>
+          <button
+            onClick={onBackToHome}
+            className="w-full border border-neutral-900 bg-neutral-900 px-6 py-3 text-sm tracking-wider text-white transition-all hover:bg-transparent hover:text-neutral-900"
+          >
+            VOLVER AL INICIO
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -141,6 +181,12 @@ export default function Admin({ onBackToHome }: AdminProps) {
               clients={clients}
               onUpdate={loadData}
             />
+          )}
+          {activeTab === 'appointments' && (
+            <AppointmentsManager onUpdate={loadData} />
+          )}
+          {activeTab === 'users' && (
+            <UsersManager onUpdate={loadData} />
           )}
           {activeTab === 'config' && <ConfigManager />}
         </main>

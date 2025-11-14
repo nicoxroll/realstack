@@ -69,23 +69,32 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-100 px-6">
-      <div className="w-full max-w-md">
+    <div className="relative flex min-h-screen items-center justify-center px-6">
+      {/* Imagen de fondo */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center"
+        style={{
+          backgroundImage: 'url(https://images.pexels.com/photos/280222/pexels-photo-280222.jpeg?auto=compress&cs=tinysrgb&w=1920)',
+        }}
+      />
+      <div className="absolute inset-0 bg-black/50" />
+      
+      <div className="relative z-10 w-full max-w-md">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center bg-neutral-900">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center bg-white/10 backdrop-blur-md">
             <Lock className="h-8 w-8 text-white" strokeWidth={1.5} />
           </div>
-          <h1 className="mb-2 text-3xl font-light tracking-wide text-neutral-900">
+          <h1 className="mb-2 text-3xl font-light tracking-wide text-white">
             Administración
           </h1>
-          <p className="text-sm font-light text-neutral-600">
+          <p className="text-sm font-light text-white/80">
             {mode === 'login' 
               ? 'Ingresa tus credenciales para continuar'
               : 'Crea tu cuenta de administrador'}
           </p>
         </div>
 
-        <div className="bg-white p-8 shadow-lg">
+        <div className="bg-white/95 backdrop-blur-md p-8 shadow-2xl">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label
@@ -188,7 +197,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           </div>
         </div>
 
-        <p className="mt-6 text-center text-xs font-light text-neutral-500">
+        <p className="mt-6 text-center text-xs font-light text-white/60">
           Acceso exclusivo para administradores autorizados
         </p>
       </div>

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { supabase, Operation, Project, Client } from '../../lib/supabase';
 import { Plus, Edit, Trash2, Save, X } from 'lucide-react';
+import { useNotification } from '../../hooks/useNotification';
+import { useConfirm } from '../../hooks/useConfirm';
 
 interface OperationsManagerProps {
   operations: Operation[];
@@ -19,6 +21,8 @@ export default function OperationsManager({
   const [editingOperation, setEditingOperation] = useState<Partial<Operation> | null>(
     null
   );
+  const { showNotification, NotificationComponent } = useNotification();
+  const { confirm, ConfirmComponent } = useConfirm();
 
   const handleCreate = () => {
     setEditingOperation({
@@ -42,29 +46,41 @@ export default function OperationsManager({
 
     try {
       if (editingOperation.id) {
-        await supabase
+        const { error } = await supabase
           .from('operations')
           .update(editingOperation)
           .eq('id', editingOperation.id);
+        if (error) throw error;
+        showNotification('Operación actualizada correctamente', 'success');
       } else {
-        await supabase.from('operations').insert([editingOperation]);
+        const { error } = await supabase.from('operations').insert([editingOperation]);
+        if (error) throw error;
+        showNotification('Operación creada correctamente', 'success');
       }
       setIsEditing(false);
       setEditingOperation(null);
       onUpdate();
     } catch (error) {
       console.error('Error saving operation:', error);
+      showNotification('Error al guardar operación', 'error');
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('¿Está seguro de eliminar esta operación?')) return;
+    const confirmed = await confirm({
+      message: '¿Está seguro de eliminar esta operación? Esta acción no se puede deshacer.'
+    });
+    
+    if (!confirmed) return;
 
     try {
-      await supabase.from('operations').delete().eq('id', id);
+      const { error } = await supabase.from('operations').delete().eq('id', id);
+      if (error) throw error;
+      showNotification('Operación eliminada correctamente', 'success');
       onUpdate();
     } catch (error) {
       console.error('Error deleting operation:', error);
+      showNotification('Error al eliminar operación', 'error');
     }
   };
 
@@ -98,9 +114,10 @@ export default function OperationsManager({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="mb-2 block text-sm font-light text-neutral-700">
-                Proyecto
+                Proyecto <span className="text-red-600">*</span>
               </label>
               <select
+                required
                 value={editingOperation.project_id || ''}
                 onChange={(e) =>
                   setEditingOperation({
@@ -121,9 +138,10 @@ export default function OperationsManager({
 
             <div>
               <label className="mb-2 block text-sm font-light text-neutral-700">
-                Cliente
+                Cliente <span className="text-red-600">*</span>
               </label>
               <select
+                required
                 value={editingOperation.client_id || ''}
                 onChange={(e) =>
                   setEditingOperation({
@@ -329,6 +347,8 @@ export default function OperationsManager({
           </p>
         )}
       </div>
+      {NotificationComponent}
+      {ConfirmComponent}
     </div>
   );
 }

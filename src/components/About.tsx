@@ -1,12 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { Mail, Phone, Send, Check } from 'lucide-react';
-import { supabase } from '../lib/supabase';
-
-interface AboutProps {
-  email: string;
-  phone: string;
-  mapsUrl?: string;
-}
 
 interface TimelineEvent {
   year: string;
@@ -42,15 +34,7 @@ const timelineEvents: TimelineEvent[] = [
   },
 ];
 
-export default function About({ email, phone, mapsUrl }: AboutProps) {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    message: '',
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitMessage, setSubmitMessage] = useState('');
+export default function About() {
   const [visibleItems, setVisibleItems] = useState<number[]>([]);
   const timelineRefs = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -81,26 +65,6 @@ export default function About({ email, phone, mapsUrl }: AboutProps) {
     };
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitMessage('');
-
-    try {
-      const { error } = await supabase.from('clients').insert([formData]);
-
-      if (error) throw error;
-
-      setSubmitMessage('Mensaje enviado correctamente. Nos contactaremos pronto.');
-      setFormData({ name: '', email: '', phone: '', message: '' });
-    } catch (error) {
-      setSubmitMessage('Error al enviar el mensaje. Por favor intente nuevamente.');
-      console.error('Error:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   return (
     <section id="nosotros" className="bg-white px-6 py-24 md:px-12 lg:px-24">
       <div className="mx-auto max-w-7xl">
@@ -110,10 +74,106 @@ export default function About({ email, phone, mapsUrl }: AboutProps) {
             Nosotros
           </h2>
           <div className="mx-auto h-px w-24 bg-neutral-300" />
-          <p className="mx-auto mt-8 max-w-2xl text-lg font-light text-neutral-600">
-            Con más de 15 años de experiencia, hemos construido un legado de excelencia
-            en el desarrollo inmobiliario de lujo.
-          </p>
+        </div>
+
+        {/* Quiénes Somos con Imagen */}
+        <div className="mb-24 grid grid-cols-1 gap-12 lg:grid-cols-2">
+          <div className="flex flex-col justify-center">
+            <h3 className="mb-6 text-3xl font-light tracking-wide text-neutral-900">
+              Quiénes Somos
+            </h3>
+            <div className="space-y-4 text-lg font-light leading-relaxed text-neutral-700">
+              <p>
+                Somos una empresa líder en el sector inmobiliario con más de 15 años de 
+                experiencia en el desarrollo de proyectos residenciales y comerciales de lujo. 
+                Nuestra misión es transformar espacios en hogares y oportunidades de inversión 
+                excepcionales.
+              </p>
+              <p>
+                Nos especializamos en crear comunidades sostenibles que combinan diseño 
+                arquitectónico innovador, tecnología de vanguardia y un compromiso inquebrantable 
+                con la calidad. Cada proyecto refleja nuestra pasión por la excelencia y nuestra 
+                dedicación a superar las expectativas de nuestros clientes.
+              </p>
+              <p>
+                Con un equipo multidisciplinario de expertos en arquitectura, ingeniería, diseño 
+                y gestión de proyectos, garantizamos que cada desarrollo inmobiliario no solo 
+                cumpla con los más altos estándares de construcción, sino que también ofrezca 
+                un valor excepcional a largo plazo.
+              </p>
+              <p className="font-medium text-neutral-900">
+                Nuestra visión es ser el referente en desarrollo inmobiliario sostenible, 
+                creando espacios que mejoren la calidad de vida de las personas y comunidades.
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex items-center">
+            <div className="aspect-[4/5] w-full overflow-hidden shadow-2xl">
+              <img
+                src="https://images.pexels.com/photos/1109541/pexels-photo-1109541.jpeg?auto=compress&cs=tinysrgb&w=800"
+                alt="Edificio moderno"
+                className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Valores */}
+        <div className="mb-24">
+          <h3 className="mb-12 text-center text-3xl font-light tracking-wide text-neutral-900">
+            Nuestros Valores
+          </h3>
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+            <div className="text-center">
+              <div className="mx-auto mb-6 aspect-square w-full max-w-xs overflow-hidden shadow-lg">
+                <img
+                  src="https://images.pexels.com/photos/416405/pexels-photo-416405.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Excelencia"
+                  className="h-full w-full object-cover transition-transform duration-500 hover:scale-110"
+                />
+              </div>
+              <h4 className="mb-3 text-xl font-light tracking-wide text-neutral-900">
+                Excelencia
+              </h4>
+              <p className="font-light text-neutral-600">
+                Nos comprometemos a entregar proyectos que superen los estándares de calidad 
+                y diseño en la industria inmobiliaria.
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="mx-auto mb-6 aspect-square w-full max-w-xs overflow-hidden shadow-lg">
+                <img
+                  src="https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Innovación"
+                  className="h-full w-full object-cover transition-transform duration-500 hover:scale-110"
+                />
+              </div>
+              <h4 className="mb-3 text-xl font-light tracking-wide text-neutral-900">
+                Innovación
+              </h4>
+              <p className="font-light text-neutral-600">
+                Implementamos las últimas tecnologías y tendencias en construcción sostenible 
+                para crear espacios modernos y eficientes.
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="mx-auto mb-6 aspect-square w-full max-w-xs overflow-hidden shadow-lg">
+                <img
+                  src="https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Confianza"
+                  className="h-full w-full object-cover transition-transform duration-500 hover:scale-110"
+                />
+              </div>
+              <h4 className="mb-3 text-xl font-light tracking-wide text-neutral-900">
+                Confianza
+              </h4>
+              <p className="font-light text-neutral-600">
+                Construimos relaciones duraderas con nuestros clientes basadas en la 
+                transparencia, honestidad y cumplimiento de promesas.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Timeline */}
@@ -171,168 +231,6 @@ export default function About({ email, phone, mapsUrl }: AboutProps) {
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-
-        {/* Formulario y Mapa */}
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
-          {/* Formulario */}
-          <div>
-            <h3 className="mb-8 text-2xl font-light tracking-wide text-neutral-900">
-              Envíanos un Mensaje
-            </h3>
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label
-                  htmlFor="name"
-                  className="mb-2 block text-sm font-light tracking-wider text-neutral-700"
-                >
-                  NOMBRE
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full border border-neutral-300 bg-white px-4 py-3 font-light text-neutral-900 transition-colors focus:border-neutral-900 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="email"
-                  className="mb-2 block text-sm font-light tracking-wider text-neutral-700"
-                >
-                  EMAIL
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full border border-neutral-300 bg-white px-4 py-3 font-light text-neutral-900 transition-colors focus:border-neutral-900 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="phone"
-                  className="mb-2 block text-sm font-light tracking-wider text-neutral-700"
-                >
-                  TELÉFONO
-                </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  required
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full border border-neutral-300 bg-white px-4 py-3 font-light text-neutral-900 transition-colors focus:border-neutral-900 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="message"
-                  className="mb-2 block text-sm font-light tracking-wider text-neutral-700"
-                >
-                  MENSAJE
-                </label>
-                <textarea
-                  id="message"
-                  required
-                  rows={4}
-                  value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="w-full resize-none border border-neutral-300 bg-white px-4 py-3 font-light text-neutral-900 transition-colors focus:border-neutral-900 focus:outline-none"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="flex w-full items-center justify-center gap-2 bg-neutral-900 px-8 py-4 font-light tracking-wider text-white transition-all hover:bg-neutral-800 disabled:bg-neutral-400"
-              >
-                {isSubmitting ? (
-                  'ENVIANDO...'
-                ) : (
-                  <>
-                    ENVIAR MENSAJE
-                    <Send className="h-4 w-4" strokeWidth={1.5} />
-                  </>
-                )}
-              </button>
-
-              {submitMessage && (
-                <div
-                  className={`flex items-center gap-2 rounded-sm p-4 ${
-                    submitMessage.includes('Error')
-                      ? 'bg-red-50 text-red-800'
-                      : 'bg-green-50 text-green-800'
-                  }`}
-                >
-                  {!submitMessage.includes('Error') && (
-                    <Check className="h-5 w-5" strokeWidth={1.5} />
-                  )}
-                  <p className="text-sm font-light">{submitMessage}</p>
-                </div>
-              )}
-            </form>
-          </div>
-
-          {/* Información de contacto y mapa */}
-          <div>
-            <h3 className="mb-8 text-2xl font-light tracking-wide text-neutral-900">
-              Información de Contacto
-            </h3>
-
-            <div className="mb-6 flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center bg-neutral-900">
-                <Mail className="h-5 w-5 text-white" strokeWidth={1.5} />
-              </div>
-              <div>
-                <p className="text-sm font-light text-neutral-500">Email</p>
-                <a
-                  href={`mailto:${email}`}
-                  className="font-light text-neutral-900 transition-colors hover:text-neutral-600"
-                >
-                  {email}
-                </a>
-              </div>
-            </div>
-
-            <div className="mb-8 flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center bg-neutral-900">
-                <Phone className="h-5 w-5 text-white" strokeWidth={1.5} />
-              </div>
-              <div>
-                <p className="text-sm font-light text-neutral-500">Teléfono</p>
-                <a
-                  href={`tel:${phone}`}
-                  className="font-light text-neutral-900 transition-colors hover:text-neutral-600"
-                >
-                  {phone}
-                </a>
-              </div>
-            </div>
-
-            {mapsUrl && (
-              <div className="aspect-video w-full overflow-hidden border border-neutral-200 shadow-md">
-                <iframe
-                  src={mapsUrl}
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="Ubicación"
-                />
-              </div>
-            )}
           </div>
         </div>
       </div>

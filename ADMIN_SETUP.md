@@ -1,5 +1,12 @@
 # Configuración del Admin
 
+> **⚠️ ACTUALIZACIÓN IMPORTANTE:** Este proyecto ahora usa un sistema de roles basado en base de datos.
+> Para configurar usuarios admin, consulta **[ROLES_SETUP.md](./ROLES_SETUP.md)** para las instrucciones actualizadas.
+
+---
+
+## Configuración Legacy (Referencia Histórica)
+
 ## Configurar autenticación en Supabase
 
 Para que el login de administrador funcione, necesitas configurar la autenticación en Supabase:

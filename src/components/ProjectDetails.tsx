@@ -1,20 +1,87 @@
-import { X, MapPin, Calendar, Home, Check } from 'lucide-react';
-import { Project } from '../lib/supabase';
+import { useState, useEffect } from 'react';
+import { X, MapPin, Calendar, Home, Check, Heart } from 'lucide-react';
+import { Project, supabase } from '../lib/supabase';
+import AppointmentCalendar from './AppointmentCalendar';
+import { useNotification } from '../hooks/useNotification';
 
 interface ProjectDetailsProps {
   project: Project;
   onClose: () => void;
+  onViewMore: () => void;
 }
 
-export default function ProjectDetails({ project, onClose }: ProjectDetailsProps) {
+export default function ProjectDetails({ project, onClose, onViewMore }: ProjectDetailsProps) {
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [showAppointmentCalendar, setShowAppointmentCalendar] = useState(false);
+  const { showNotification, NotificationComponent } = useNotification();
+
+  useEffect(() => {
+    checkFavoriteStatus();
+  }, [project.id]);
+
+  const checkFavoriteStatus = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      setUser(user);
+      const { data } = await supabase
+        .from('user_favorites')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('project_id', project.id)
+        .maybeSingle();
+      setIsFavorite(!!data);
+    }
+  };
+
+  const toggleFavorite = async () => {
+    if (!user) {
+      showNotification('Debes iniciar sesión para agregar favoritos', 'warning');
+      return;
+    }
+
+    if (isFavorite) {
+      await supabase
+        .from('user_favorites')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('project_id', project.id);
+      setIsFavorite(false);
+    } else {
+      await supabase
+        .from('user_favorites')
+        .insert([{ user_id: user.id, project_id: project.id }]);
+      setIsFavorite(true);
+    }
+  };
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-      <div className="relative max-h-[90vh] w-full max-w-5xl overflow-y-auto bg-white">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+      onClick={onClose}
+    >
+      <div 
+        className="relative max-h-[90vh] w-full max-w-5xl overflow-y-auto bg-white"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
           onClick={onClose}
           className="absolute right-4 top-4 z-10 bg-white/90 p-2 backdrop-blur-sm transition-colors hover:bg-white"
         >
           <X className="h-6 w-6 text-neutral-900" strokeWidth={1.5} />
+        </button>
+
+        <button
+          onClick={toggleFavorite}
+          className="absolute right-16 top-4 z-10 p-2 transition-all"
+          title={isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+        >
+          <Heart
+            className={`h-6 w-6 ${
+              isFavorite ? 'text-red-500 fill-red-500' : 'text-white'
+            }`}
+            strokeWidth={1.5}
+            fill={isFavorite ? 'currentColor' : 'none'}
+          />
         </button>
 
         <div className="relative aspect-[21/9] w-full">
@@ -90,16 +157,30 @@ export default function ProjectDetails({ project, onClose }: ProjectDetailsProps
             </div>
           )}
 
-          <div className="flex gap-4">
-            <button className="flex-1 border border-neutral-900 bg-neutral-900 px-8 py-4 text-sm tracking-wider text-white transition-all hover:bg-transparent hover:text-neutral-900">
-              SOLICITAR INFORMACIÓN
+          <div className="flex flex-col gap-4 md:flex-row">"
+            <button 
+              onClick={onViewMore}
+              className="flex-1 border border-neutral-900 bg-neutral-900 px-8 py-4 text-sm tracking-wider text-white transition-all hover:bg-white hover:text-neutral-900"
+            >
+              VER MÁS DETALLES
             </button>
-            <button className="flex-1 border border-neutral-300 bg-transparent px-8 py-4 text-sm tracking-wider text-neutral-900 transition-all hover:border-neutral-900">
+            <button 
+              onClick={() => setShowAppointmentCalendar(true)}
+              className="flex-1 border border-neutral-900 bg-white px-8 py-4 text-sm tracking-wider text-neutral-900 transition-all hover:bg-neutral-900 hover:text-white"
+            >
               AGENDAR VISITA
             </button>
           </div>
         </div>
       </div>
+
+      {showAppointmentCalendar && (
+        <AppointmentCalendar
+          project={project}
+          onClose={() => setShowAppointmentCalendar(false)}
+        />
+      )}
+      {NotificationComponent}
     </div>
   );
 }

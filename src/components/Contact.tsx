@@ -39,13 +39,13 @@ export default function Contact({ email, phone, mapsUrl }: ContactProps) {
   };
 
   return (
-    <section id="contact" className="bg-neutral-900 px-6 py-24 text-white md:px-12 lg:px-24">
+    <section id="contact" className="bg-neutral-100 px-6 py-24 text-neutral-900 md:px-12 lg:px-24">
       <div className="mx-auto max-w-7xl">
         <div className="mb-16 text-center">
           <h2 className="mb-4 text-4xl font-light tracking-wide md:text-5xl">
             Contáctanos
           </h2>
-          <div className="mx-auto h-px w-24 bg-neutral-500" />
+          <div className="mx-auto h-px w-24 bg-neutral-400" />
         </div>
 
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
@@ -55,14 +55,14 @@ export default function Contact({ email, phone, mapsUrl }: ContactProps) {
             </h3>
 
             <div className="mb-6 flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center bg-white/10">
-                <Mail className="h-5 w-5" strokeWidth={1.5} />
+              <div className="flex h-12 w-12 items-center justify-center bg-neutral-900">
+                <Mail className="h-5 w-5 text-white" strokeWidth={1.5} />
               </div>
               <div>
-                <p className="text-sm font-light text-white/60">Email</p>
+                <p className="text-sm font-light text-neutral-500">Email</p>
                 <a
                   href={`mailto:${email}`}
-                  className="font-light transition-colors hover:text-white/80"
+                  className="font-light transition-colors hover:text-neutral-600"
                 >
                   {email}
                 </a>
@@ -70,14 +70,14 @@ export default function Contact({ email, phone, mapsUrl }: ContactProps) {
             </div>
 
             <div className="mb-12 flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center bg-white/10">
-                <Phone className="h-5 w-5" strokeWidth={1.5} />
+              <div className="flex h-12 w-12 items-center justify-center bg-neutral-900">
+                <Phone className="h-5 w-5 text-white" strokeWidth={1.5} />
               </div>
               <div>
-                <p className="text-sm font-light text-white/60">Teléfono</p>
+                <p className="text-sm font-light text-neutral-500">Teléfono</p>
                 <a
                   href={`tel:${phone}`}
-                  className="font-light transition-colors hover:text-white/80"
+                  className="font-light transition-colors hover:text-neutral-600"
                 >
                   {phone}
                 </a>
@@ -85,7 +85,7 @@ export default function Contact({ email, phone, mapsUrl }: ContactProps) {
             </div>
 
             {mapsUrl && (
-              <div className="aspect-video w-full overflow-hidden border border-white/10">
+              <div className="aspect-video w-full overflow-hidden border border-neutral-300">
                 <iframe
                   src={mapsUrl}
                   width="100%"
@@ -113,7 +113,7 @@ export default function Contact({ email, phone, mapsUrl }: ContactProps) {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
-                  className="w-full border border-white/20 bg-transparent px-6 py-4 font-light text-white placeholder-white/40 transition-colors focus:border-white focus:outline-none"
+                  className="w-full border border-neutral-300 bg-white px-6 py-4 font-light text-neutral-900 placeholder-neutral-400 transition-colors focus:border-neutral-900 focus:outline-none"
                 />
               </div>
 
@@ -124,7 +124,7 @@ export default function Contact({ email, phone, mapsUrl }: ContactProps) {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
-                  className="w-full border border-white/20 bg-transparent px-6 py-4 font-light text-white placeholder-white/40 transition-colors focus:border-white focus:outline-none"
+                  className="w-full border border-neutral-300 bg-white px-6 py-4 font-light text-neutral-900 placeholder-neutral-400 transition-colors focus:border-neutral-900 focus:outline-none"
                 />
               </div>
 
@@ -134,7 +134,7 @@ export default function Contact({ email, phone, mapsUrl }: ContactProps) {
                   placeholder="Teléfono"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full border border-white/20 bg-transparent px-6 py-4 font-light text-white placeholder-white/40 transition-colors focus:border-white focus:outline-none"
+                  className="w-full border border-neutral-300 bg-white px-6 py-4 font-light text-neutral-900 placeholder-neutral-400 transition-colors focus:border-neutral-900 focus:outline-none"
                 />
               </div>
 
@@ -144,21 +144,21 @@ export default function Contact({ email, phone, mapsUrl }: ContactProps) {
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   rows={5}
-                  className="w-full resize-none border border-white/20 bg-transparent px-6 py-4 font-light text-white placeholder-white/40 transition-colors focus:border-white focus:outline-none"
+                  className="w-full resize-none border border-neutral-300 bg-white px-6 py-4 font-light text-neutral-900 placeholder-neutral-400 transition-colors focus:border-neutral-900 focus:outline-none"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex w-full items-center justify-center gap-2 border border-white bg-white px-8 py-4 text-sm tracking-wider text-neutral-900 transition-all hover:bg-transparent hover:text-white disabled:opacity-50"
+                className="flex w-full items-center justify-center gap-2 bg-neutral-900 px-8 py-4 text-sm tracking-wider text-white transition-all hover:bg-neutral-800 disabled:opacity-50"
               >
                 {isSubmitting ? 'ENVIANDO...' : 'ENVIAR MENSAJE'}
                 <Send className="h-4 w-4" strokeWidth={1.5} />
               </button>
 
               {submitMessage && (
-                <p className={`text-center text-sm font-light ${submitMessage.includes('Error') ? 'text-red-400' : 'text-green-400'}`}>
+                <p className={`text-center text-sm font-light ${submitMessage.includes('Error') ? 'text-red-600' : 'text-green-600'}`}>
                   {submitMessage}
                 </p>
               )}

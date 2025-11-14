@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { supabase, Project } from '../../lib/supabase';
 import { Plus, Edit, Trash2, Save, X } from 'lucide-react';
+import { useNotification } from '../../hooks/useNotification';
+import { useConfirm } from '../../hooks/useConfirm';
+import MapPicker from './MapPicker';
 
 interface ProjectsManagerProps {
   projects: Project[];
@@ -10,6 +13,8 @@ interface ProjectsManagerProps {
 export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editingProject, setEditingProject] = useState<Partial<Project> | null>(null);
+  const { showNotification, NotificationComponent } = useNotification();
+  const { confirm, ConfirmComponent } = useConfirm();
 
   const handleCreate = () => {
     setEditingProject({
@@ -38,29 +43,41 @@ export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerP
 
     try {
       if (editingProject.id) {
-        await supabase
+        const { error } = await supabase
           .from('projects')
           .update(editingProject)
           .eq('id', editingProject.id);
+        if (error) throw error;
+        showNotification('Proyecto actualizado correctamente', 'success');
       } else {
-        await supabase.from('projects').insert([editingProject]);
+        const { error } = await supabase.from('projects').insert([editingProject]);
+        if (error) throw error;
+        showNotification('Proyecto creado correctamente', 'success');
       }
       setIsEditing(false);
       setEditingProject(null);
       onUpdate();
     } catch (error) {
       console.error('Error saving project:', error);
+      showNotification('Error al guardar proyecto', 'error');
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('¿Está seguro de eliminar este proyecto?')) return;
+    const confirmed = await confirm({
+      message: '¿Está seguro de eliminar este proyecto? Esta acción no se puede deshacer.'
+    });
+    
+    if (!confirmed) return;
 
     try {
-      await supabase.from('projects').delete().eq('id', id);
+      const { error } = await supabase.from('projects').delete().eq('id', id);
+      if (error) throw error;
+      showNotification('Proyecto eliminado correctamente', 'success');
       onUpdate();
     } catch (error) {
       console.error('Error deleting project:', error);
+      showNotification('Error al eliminar proyecto', 'error');
     }
   };
 
@@ -86,10 +103,11 @@ export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerP
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="mb-2 block text-sm font-light text-neutral-700">
-                Nombre
+                Nombre <span className="text-red-600">*</span>
               </label>
               <input
                 type="text"
+                required
                 value={editingProject.name || ''}
                 onChange={(e) =>
                   setEditingProject({ ...editingProject, name: e.target.value })
@@ -100,10 +118,11 @@ export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerP
 
             <div>
               <label className="mb-2 block text-sm font-light text-neutral-700">
-                Ubicación
+                Ubicación <span className="text-red-600">*</span>
               </label>
               <input
                 type="text"
+                required
                 value={editingProject.location || ''}
                 onChange={(e) =>
                   setEditingProject({ ...editingProject, location: e.target.value })
@@ -115,9 +134,10 @@ export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerP
 
           <div>
             <label className="mb-2 block text-sm font-light text-neutral-700">
-              Descripción
+              Descripción <span className="text-red-600">*</span>
             </label>
             <textarea
+              required
               value={editingProject.description || ''}
               onChange={(e) =>
                 setEditingProject({ ...editingProject, description: e.target.value })
@@ -129,15 +149,17 @@ export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerP
 
           <div>
             <label className="mb-2 block text-sm font-light text-neutral-700">
-              URL de Imagen
+              URL de Imagen <span className="text-red-600">*</span>
             </label>
             <input
-              type="text"
+              type="url"
+              required
               value={editingProject.image_url || ''}
               onChange={(e) =>
                 setEditingProject({ ...editingProject, image_url: e.target.value })
               }
               className="w-full border border-neutral-300 px-4 py-2 focus:border-neutral-900 focus:outline-none"
+              placeholder="https://ejemplo.com/imagen.jpg"
             />
           </div>
 
@@ -197,10 +219,11 @@ export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerP
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="mb-2 block text-sm font-light text-neutral-700">
-                Fecha de Entrega
+                Fecha de Entrega <span className="text-red-600">*</span>
               </label>
               <input
                 type="text"
+                required
                 value={editingProject.delivery_date || ''}
                 onChange={(e) =>
                   setEditingProject({
@@ -209,6 +232,7 @@ export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerP
                   })
                 }
                 className="w-full border border-neutral-300 px-4 py-2 focus:border-neutral-900 focus:outline-none"
+                placeholder="Ej: Q4 2025, Diciembre 2025"
               />
             </div>
 
@@ -227,6 +251,57 @@ export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerP
                 <option value="sold_out">Agotado</option>
                 <option value="coming_soon">Próximamente</option>
               </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-light text-neutral-700">
+              Ubicación en Mapa (opcional)
+            </label>
+            <p className="mb-3 text-xs font-light text-neutral-500">
+              Busca una dirección o haz click en el mapa para seleccionar la ubicación
+            </p>
+            <MapPicker
+              latitude={editingProject.latitude}
+              longitude={editingProject.longitude}
+              onLocationSelect={(lat, lng) => {
+                setEditingProject({
+                  ...editingProject,
+                  latitude: lat,
+                  longitude: lng,
+                });
+              }}
+              onClose={() => {}}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="mb-2 block text-sm font-light text-neutral-700">
+                Latitud
+              </label>
+              <input
+                type="number"
+                step="0.000001"
+                value={editingProject.latitude || ''}
+                readOnly
+                className="w-full border border-neutral-300 bg-neutral-50 px-4 py-2 text-neutral-600"
+                placeholder="Se actualiza automáticamente"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-light text-neutral-700">
+                Longitud
+              </label>
+              <input
+                type="number"
+                step="0.000001"
+                value={editingProject.longitude || ''}
+                readOnly
+                className="w-full border border-neutral-300 bg-neutral-50 px-4 py-2 text-neutral-600"
+                placeholder="Se actualiza automáticamente"
+              />
             </div>
           </div>
 
@@ -364,6 +439,8 @@ export default function ProjectsManager({ projects, onUpdate }: ProjectsManagerP
           </tbody>
         </table>
       </div>
+      {NotificationComponent}
+      {ConfirmComponent}
     </div>
   );
 }

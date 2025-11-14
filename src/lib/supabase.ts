@@ -5,6 +5,22 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+export type UnitType = {
+  id: string;
+  name: string;
+  bedrooms: number;
+  bathrooms: number;
+  area: number;
+  price: number;
+};
+
+export type GalleryImages = {
+  kitchen?: string[];
+  bathroom?: string[];
+  bedroom?: string[];
+  living?: string[];
+};
+
 export type Project = {
   id: string;
   name: string;
@@ -20,6 +36,11 @@ export type Project = {
   status: string;
   created_at: string;
   updated_at: string;
+  gallery_images?: GalleryImages;
+  floor_plan_url?: string;
+  latitude?: number;
+  longitude?: number;
+  unit_types?: UnitType[];
 };
 
 export type Client = {
