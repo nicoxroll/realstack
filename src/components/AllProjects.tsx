@@ -1,4 +1,5 @@
-import { MapPin, Calendar, Home } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { MapPin, Calendar, Home, ChevronDown } from 'lucide-react';
 import { Project } from '../lib/supabase';
 
 interface AllProjectsProps {
@@ -7,17 +8,68 @@ interface AllProjectsProps {
 }
 
 export default function AllProjects({ projects, onViewDetails }: AllProjectsProps) {
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const opacity = Math.max(0, 1 - scrollY / 600);
+  const scale = Math.max(0.9, 1 - scrollY / 2000);
+
   return (
-    <section id="all-projects" className="bg-white px-6 py-24 md:px-12 lg:px-24">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-16 text-center">
-          <h2 className="mb-4 text-4xl font-light tracking-wide text-neutral-900 md:text-5xl">
-            Todos los Proyectos
-          </h2>
-          <div className="mx-auto h-px w-24 bg-neutral-400" />
+    <>
+      {/* Hero con Parallax */}
+      <section className="relative h-[60vh] w-full overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center transition-all duration-300"
+          style={{
+            backgroundImage: 'url(https://images.pexels.com/photos/1370704/pexels-photo-1370704.jpeg?auto=compress&cs=tinysrgb&w=1920)',
+            opacity,
+            transform: `scale(${scale})`,
+          }}
+        />
+        <div className="absolute inset-0 bg-black/50" />
+        
+        <div className="relative flex h-full items-center justify-center px-6 text-center">
+          <div className="max-w-4xl" style={{ opacity }}>
+            <h1 className="mb-6 text-5xl font-light tracking-wide text-white md:text-6xl lg:text-7xl">
+              Nuestros Proyectos
+            </h1>
+            <p className="mx-auto max-w-2xl text-lg font-light leading-relaxed text-white/90 md:text-xl">
+              Descubre nuestra selección completa de desarrollos inmobiliarios de lujo
+            </p>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+        <button
+          onClick={() => {
+            const projectsSection = document.getElementById('projects-grid');
+            projectsSection?.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce text-white transition-opacity hover:opacity-70"
+          style={{ opacity }}
+        >
+          <ChevronDown size={40} strokeWidth={1} />
+        </button>
+      </section>
+
+      {/* Grid de proyectos */}
+      <section id="projects-grid" className="bg-white px-6 py-24 md:px-12 lg:px-24">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-16 text-center">
+            <h2 className="mb-4 text-4xl font-light tracking-wide text-neutral-900 md:text-5xl">
+              Todos los Proyectos
+            </h2>
+            <div className="mx-auto h-px w-24 bg-neutral-400" />
+          </div>
+
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           {projects.map((project) => (
             <div
               key={project.id}
@@ -80,5 +132,6 @@ export default function AllProjects({ projects, onViewDetails }: AllProjectsProp
         </div>
       </div>
     </section>
+    </>
   );
 }
