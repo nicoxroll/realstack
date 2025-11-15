@@ -21,13 +21,6 @@ export default function Footer({ email, phone, scrollToSection }: FooterProps) {
     sectionId: string
   ) => {
     e.preventDefault();
-    // Special handling for projects link if needed, for now, it does nothing
-    if (sectionId === "proyectos") {
-      // In a real app, you might want to call a function passed via props
-      // to switch the view to 'all-projects'
-      console.log("Navigate to all projects view");
-      return;
-    }
     scrollToSection(sectionId);
   };
 
@@ -85,7 +78,7 @@ export default function Footer({ email, phone, scrollToSection }: FooterProps) {
               </li>
               <li>
                 <button
-                  onClick={(e) => handleNavClick(e, "proyectos")}
+                  onClick={(e) => handleNavClick(e, "featured-projects")}
                   className="font-light text-white/70 transition-colors hover:text-white text-left w-full bg-transparent border-none p-0"
                 >
                   Proyectos

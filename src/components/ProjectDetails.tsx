@@ -6,6 +6,7 @@ import {
   Heart,
   Home,
   MapPin,
+  MessageSquare,
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -35,7 +36,15 @@ export default function ProjectDetails({
   ];
 
   useEffect(() => {
+    // Deshabilitar scroll del body cuando el modal está abierto
+    document.body.style.overflow = "hidden";
+
     checkFavoriteStatus();
+
+    return () => {
+      // Rehabilitar scroll del body cuando el modal se cierra
+      document.body.style.overflow = "unset";
+    };
   }, [project.id]);
 
   // Auto-avanzar carrusel cada 5 segundos si hay más de una imagen
@@ -106,19 +115,21 @@ export default function ProjectDetails({
           <X className="h-6 w-6 text-neutral-900" strokeWidth={1.5} />
         </button>
 
-        <button
-          onClick={toggleFavorite}
-          className="absolute right-16 top-4 z-10 p-2 transition-all"
-          title={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
-        >
-          <Heart
-            className={`h-6 w-6 ${
-              isFavorite ? "text-red-500 fill-red-500" : "text-white"
-            }`}
-            strokeWidth={1.5}
-            fill={isFavorite ? "currentColor" : "none"}
-          />
-        </button>
+        {user && (
+          <button
+            onClick={toggleFavorite}
+            className="absolute right-16 top-4 z-10 p-2 transition-all"
+            title={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
+          >
+            <Heart
+              className={`h-6 w-6 ${
+                isFavorite ? "text-red-500 fill-red-500" : "text-white"
+              }`}
+              strokeWidth={1.5}
+              fill={isFavorite ? "currentColor" : "none"}
+            />
+          </button>
+        )}
 
         <div className="relative aspect-[21/9] w-full overflow-hidden">
           {/* Renderizar todas las imágenes con opacidad controlada */}
@@ -271,6 +282,17 @@ export default function ProjectDetails({
             >
               VER MÁS DETALLES
             </button>
+            <a
+              href={`https://wa.me/5492214445555?text=${encodeURIComponent(
+                `Estoy interesado en el proyecto ${project.name}`
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex w-full items-center justify-center gap-2 border border-green-600 bg-green-600 px-8 py-4 text-sm tracking-wider text-white transition-all hover:bg-green-700"
+            >
+              <MessageSquare className="h-5 w-5" />
+              <span>CONTACTAR POR WHATSAPP</span>
+            </a>
           </div>
         </div>
       </div>

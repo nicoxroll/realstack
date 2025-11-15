@@ -1,3 +1,4 @@
+import Lenis from "lenis";
 import { Home, LogIn, LogOut, Menu, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import About from "./components/About";
@@ -35,6 +36,26 @@ function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  useEffect(() => {
+    // Initialize Lenis for smooth scrolling
+    const lenis = new Lenis();
+
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+
+    // Store lenis instance to use it in other functions
+    (window as any).lenis = lenis;
+
+    return () => {
+      lenis.destroy();
+      (window as any).lenis = null;
+    };
+  }, []);
 
   useEffect(() => {
     loadData();
@@ -106,14 +127,14 @@ function App() {
     setSelectedProject(null);
     setSelectedProjectId(id);
     setView("project-landing");
-    window.scrollTo(0, 0);
+    (window as any).lenis?.scrollTo(0, { immediate: true });
   };
 
   const handleViewAll = () => {
     setView("all-projects");
     // Scroll suave hacia arriba
     setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      (window as any).lenis?.scrollTo(0);
     }, 100);
   };
 
@@ -121,8 +142,7 @@ function App() {
     const performScroll = () => {
       const element = document.getElementById(sectionId);
       if (element) {
-        // The 'block: "start"' option ensures the top of the element aligns with the top of the viewport, respecting scroll-margin.
-        element.scrollIntoView({ behavior: "smooth", block: "start" });
+        (window as any).lenis?.scrollTo(element);
       }
     };
 
@@ -190,6 +210,7 @@ function App() {
           setView("home");
           checkUser();
         }}
+        onViewProject={(id) => handleViewMore(id)}
       />
     );
   }
@@ -231,13 +252,7 @@ function App() {
             {/* Menú de navegación central */}
             <div className="hidden md:flex items-center gap-8">
               <button
-                onClick={() => {
-                  setView("home");
-                  setTimeout(
-                    () => window.scrollTo({ top: 0, behavior: "smooth" }),
-                    100
-                  );
-                }}
+                onClick={() => scrollToSection("inicio")}
                 className={`text-sm font-light tracking-wider transition-colors ${
                   scrollY > 100
                     ? "text-neutral-600 hover:text-neutral-900"
@@ -247,14 +262,11 @@ function App() {
                 INICIO
               </button>
               <button
-                onClick={() => {
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                  setTimeout(() => handleViewAll(), 100);
-                }}
-                className={`text-sm font-light tracking-wider ${
+                onClick={() => scrollToSection("featured-projects")}
+                className={`text-sm font-light tracking-wider transition-colors ${
                   scrollY > 100
-                    ? "text-neutral-900 border-b-2 border-neutral-900"
-                    : "text-white border-b-2 border-white"
+                    ? "text-neutral-600 hover:text-neutral-900"
+                    : "text-white/90 hover:text-white"
                 }`}
               >
                 PROYECTOS
@@ -268,6 +280,16 @@ function App() {
                 }`}
               >
                 NOSOTROS
+              </button>
+              <button
+                onClick={() => scrollToSection("contact")}
+                className={`text-sm font-light tracking-wider transition-colors ${
+                  scrollY > 100
+                    ? "text-neutral-600 hover:text-neutral-900"
+                    : "text-white/90 hover:text-white"
+                }`}
+              >
+                CONTACTO
               </button>
             </div>
             {/* Right side icons & mobile menu button */}
@@ -332,13 +354,17 @@ function App() {
             <div className="absolute left-0 top-full w-full bg-white/95 backdrop-blur-md md:hidden">
               <div className="flex flex-col items-center space-y-6 py-8">
                 <button
-                  onClick={() => handleMobileNavClick("inicio")}
+                  onClick={() => {
+                    handleMobileNavClick("inicio");
+                  }}
                   className="text-lg font-light text-neutral-800"
                 >
                   INICIO
                 </button>
                 <button
-                  onClick={() => handleMobileNavClick("featured-projects")}
+                  onClick={() => {
+                    handleMobileNavClick("featured-projects");
+                  }}
                   className="text-lg font-light text-neutral-800"
                 >
                   PROYECTOS

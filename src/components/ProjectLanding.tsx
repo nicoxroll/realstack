@@ -5,15 +5,20 @@ import {
   CalendarClock,
   Check,
   ChevronLeft,
+  ChevronRight,
   Heart,
   Home,
   MapPin,
   Maximize2,
+  MessageSquare,
+  Play,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useNotification } from "../hooks/useNotification";
-import { Project, supabase } from "../lib/supabase";
+import { PageConfig, Project, supabase } from "../lib/supabase";
 import AppointmentCalendar from "./AppointmentCalendar";
+import Contact from "./Contact";
+import Footer from "./Footer";
 
 // Declaración de tipos para Leaflet
 declare global {
@@ -54,6 +59,7 @@ export default function ProjectLanding({
   onClose,
 }: ProjectLandingProps) {
   const [project, setProject] = useState<Project | null>(null);
+  const [config, setConfig] = useState<PageConfig | null>(null);
   const [activeTab, setActiveTab] = useState(0);
   const [scrollY, setScrollY] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -64,8 +70,34 @@ export default function ProjectLanding({
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const { showNotification, NotificationComponent } = useNotification();
+  const [isVisible, setIsVisible] = useState(false);
+  const [mediaIndex, setMediaIndex] = useState(0);
+
+  // Media carousel - video + imágenes de muestra
+  const mediaItems = [
+    { type: "video", url: "https://www.youtube.com/embed/260Ttm-MTDQ" },
+    {
+      type: "image",
+      url: "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    },
+    {
+      type: "image",
+      url: "https://images.pexels.com/photos/1648776/pexels-photo-1648776.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    },
+    {
+      type: "image",
+      url: "https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    },
+    {
+      type: "image",
+      url: "https://images.pexels.com/photos/2062426/pexels-photo-2062426.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    },
+  ];
 
   useEffect(() => {
+    // Activar animación de entrada
+    setTimeout(() => setIsVisible(true), 50);
+
     loadProject();
     checkFavoriteStatus();
 
@@ -172,15 +204,27 @@ export default function ProjectLanding({
   }, [project?.latitude, project?.longitude, project?.name, project?.location]);
 
   const loadProject = async () => {
-    const { data } = await supabase
-      .from("projects")
-      .select("*")
-      .eq("id", projectId)
-      .single();
+    const [projectRes, configRes] = await Promise.all([
+      supabase.from("projects").select("*").eq("id", projectId).single(),
+      supabase.from("page_config").select("*").maybeSingle(),
+    ]);
 
-    if (data) {
-      setProject(data);
+    if (projectRes.data) {
+      setProject(projectRes.data);
     }
+    if (configRes.data) {
+      setConfig(configRes.data);
+    }
+  };
+
+  const scrollToSection = (sectionId: string) => {
+    onClose();
+    setTimeout(() => {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        (window as any).lenis?.scrollTo(element);
+      }
+    }, 300);
   };
 
   const checkFavoriteStatus = async () => {
@@ -241,7 +285,11 @@ export default function ProjectLanding({
   const opacity = Math.max(0, 1 - scrollY / 600);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div
+      className={`min-h-screen bg-white transition-opacity duration-500 ${
+        isVisible ? "opacity-100" : "opacity-0"
+      }`}
+    >
       {/* Header flotante */}
       <header
         className={`fixed top-0 z-50 w-full transition-all duration-300 ${
@@ -294,25 +342,42 @@ export default function ProjectLanding({
           className="absolute bottom-8 right-8 flex gap-4"
           style={{ opacity }}
         >
-          <button
-            onClick={() => setShowAppointmentCalendar(true)}
-            className="flex items-center gap-2 border border-white bg-white px-6 py-4 text-neutral-900 shadow-lg transition-all hover:bg-neutral-900 hover:text-white"
+          <a
+            href={`https://wa.me/5492214445555?text=${encodeURIComponent(
+              `Estoy interesado en el proyecto ${project.name}`
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 border border-green-500 bg-green-500 px-4 py-4 md:px-6 text-white shadow-lg transition-all hover:bg-green-600"
           >
-            <CalendarClock className="h-6 w-6" strokeWidth={1.5} />
-            <span className="text-sm font-light tracking-wider">
-              AGENDAR TURNO
+            <MessageSquare className="h-6 w-6" strokeWidth={1.5} />
+            <span className="hidden md:inline text-sm font-light tracking-wider">
+              CONSULTAR POR WHATSAPP
             </span>
-          </button>
+          </a>
+          {user && (
+            <>
+              <button
+                onClick={() => setShowAppointmentCalendar(true)}
+                className="flex items-center gap-2 border border-white bg-white px-4 py-4 md:px-6 text-neutral-900 shadow-lg transition-all hover:bg-neutral-900 hover:text-white"
+              >
+                <CalendarClock className="h-6 w-6" strokeWidth={1.5} />
+                <span className="hidden md:inline text-sm font-light tracking-wider">
+                  AGENDAR TURNO
+                </span>
+              </button>
 
-          <button onClick={toggleFavorite} className="p-4 transition-all">
-            <Heart
-              className={`h-6 w-6 ${
-                isFavorite ? "text-red-500 fill-red-500" : "text-white"
-              }`}
-              strokeWidth={1.5}
-              fill={isFavorite ? "currentColor" : "none"}
-            />
-          </button>
+              <button onClick={toggleFavorite} className="p-4 transition-all">
+                <Heart
+                  className={`h-6 w-6 ${
+                    isFavorite ? "text-red-500 fill-red-500" : "text-white"
+                  }`}
+                  strokeWidth={1.5}
+                  fill={isFavorite ? "currentColor" : "none"}
+                />
+              </button>
+            </>
+          )}
         </div>
 
         <div
@@ -749,28 +814,112 @@ export default function ProjectLanding({
         </section>
       )}
 
-      {/* CTA Final */}
+      {/* Media Gallery Section */}
       <section className="bg-neutral-900 px-6 py-24 text-white md:px-12 lg:px-24">
-        <div className="mx-auto max-w-4xl text-center">
-          <h2 className="mb-6 text-4xl font-light tracking-wide md:text-5xl">
-            ¿Interesado en {project.name}?
+        <div className="mx-auto max-w-7xl">
+          <h2 className="mb-16 text-center text-4xl font-light tracking-wide md:text-5xl">
+            Galería Multimedia
           </h2>
-          <p className="mb-8 text-lg font-light text-white/80">
-            Contáctanos para más información y agenda tu visita
-          </p>
-          <button
-            onClick={() => {
-              onClose();
-              setTimeout(() => {
-                document.getElementById("contact")?.scrollIntoView();
-              }, 300);
-            }}
-            className="border border-white bg-white px-12 py-4 text-sm font-light tracking-wider text-neutral-900 transition-all hover:bg-transparent hover:text-white"
-          >
-            CONTACTAR
-          </button>
+
+          {/* Carrusel de media */}
+          <div className="relative mb-12">
+            <div className="aspect-video w-full overflow-hidden bg-black">
+              {mediaItems[mediaIndex].type === "video" ? (
+                <iframe
+                  key={mediaIndex}
+                  className="h-full w-full"
+                  src={mediaItems[mediaIndex].url}
+                  title="YouTube video player"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                ></iframe>
+              ) : (
+                <img
+                  src={mediaItems[mediaIndex].url}
+                  alt={`Media ${mediaIndex + 1}`}
+                  className="h-full w-full object-cover"
+                />
+              )}
+            </div>
+
+            {/* Botones de navegación */}
+            <button
+              onClick={() =>
+                setMediaIndex((prev) =>
+                  prev === 0 ? mediaItems.length - 1 : prev - 1
+                )
+              }
+              className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/20 p-3 backdrop-blur-sm transition-all hover:bg-white/40 hover:scale-110"
+            >
+              <ChevronLeft className="h-6 w-6 text-white" strokeWidth={1.5} />
+            </button>
+            <button
+              onClick={() =>
+                setMediaIndex((prev) =>
+                  prev === mediaItems.length - 1 ? 0 : prev + 1
+                )
+              }
+              className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/20 p-3 backdrop-blur-sm transition-all hover:bg-white/40 hover:scale-110"
+            >
+              <ChevronRight className="h-6 w-6 text-white" strokeWidth={1.5} />
+            </button>
+
+            {/* Indicador de tipo de media */}
+            {mediaItems[mediaIndex].type === "video" && (
+              <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-full bg-black/50 px-4 py-2 backdrop-blur-sm">
+                <Play className="h-4 w-4 text-white" strokeWidth={1.5} />
+                <span className="text-sm font-light text-white">Video</span>
+              </div>
+            )}
+          </div>
+
+          {/* Thumbnails */}
+          <div className="grid grid-cols-5 gap-4">
+            {mediaItems.map((item, idx) => (
+              <button
+                key={idx}
+                onClick={() => setMediaIndex(idx)}
+                className={`relative aspect-video overflow-hidden transition-all ${
+                  mediaIndex === idx
+                    ? "ring-4 ring-white"
+                    : "opacity-60 hover:opacity-100"
+                }`}
+              >
+                {item.type === "video" ? (
+                  <div className="flex h-full w-full items-center justify-center bg-black">
+                    <Play className="h-8 w-8 text-white" strokeWidth={1.5} />
+                  </div>
+                ) : (
+                  <img
+                    src={item.url}
+                    alt={`Thumbnail ${idx + 1}`}
+                    className="h-full w-full object-cover"
+                  />
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       </section>
+
+      {/* Contacto */}
+      {config && (
+        <Contact
+          email={config.contact_email}
+          phone={config.contact_phone}
+          mapsUrl={config.maps_embed_url}
+        />
+      )}
+
+      {/* Footer */}
+      {config && (
+        <Footer
+          email={config.contact_email}
+          phone={config.contact_phone}
+          scrollToSection={scrollToSection}
+        />
+      )}
 
       {/* Modal de calendario para agendar turno */}
       {showAppointmentCalendar && project && (

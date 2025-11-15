@@ -3,6 +3,7 @@ import {
   ChevronDown,
   Grid,
   Home,
+  Loader,
   Map,
   MapPin,
   SlidersHorizontal,
@@ -29,6 +30,7 @@ export default function AllProjects({
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<FilterValues>({});
   const [filteredProjects, setFilteredProjects] = useState<Project[]>(projects);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -40,29 +42,35 @@ export default function AllProjects({
   }, []);
 
   useEffect(() => {
-    let result = [...projects];
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      let result = [...projects];
 
-    if (filters.minPrice) {
-      result = result.filter((p) => p.price_from >= filters.minPrice!);
-    }
-    if (filters.maxPrice) {
-      result = result.filter((p) => p.price_from <= filters.maxPrice!);
-    }
-    if (filters.location) {
-      result = result.filter((p) =>
-        p.location.toLowerCase().includes(filters.location!.toLowerCase())
-      );
-    }
-    if (filters.minUnits) {
-      result = result.filter((p) => p.units_available >= filters.minUnits!);
-    }
-    if (filters.deliveryYear) {
-      result = result.filter((p) =>
-        p.delivery_date.includes(filters.deliveryYear!)
-      );
-    }
+      if (filters.minPrice) {
+        result = result.filter((p) => p.price_from >= filters.minPrice!);
+      }
+      if (filters.maxPrice) {
+        result = result.filter((p) => p.price_from <= filters.maxPrice!);
+      }
+      if (filters.location) {
+        result = result.filter((p) =>
+          p.location.toLowerCase().includes(filters.location!.toLowerCase())
+        );
+      }
+      if (filters.minUnits) {
+        result = result.filter((p) => p.units_available >= filters.minUnits!);
+      }
+      if (filters.deliveryYear) {
+        result = result.filter((p) =>
+          p.delivery_date.includes(filters.deliveryYear!)
+        );
+      }
 
-    setFilteredProjects(result);
+      setFilteredProjects(result);
+      setIsLoading(false);
+    }, 1000); // 1 second delay
+
+    return () => clearTimeout(timer);
   }, [filters, projects]);
 
   // Contar filtros activos
@@ -170,7 +178,11 @@ export default function AllProjects({
             </div>
           </div>
 
-          {viewMode === "map" ? (
+          {isLoading ? (
+            <div className="flex h-96 items-center justify-center">
+              <Loader className="h-12 w-12 animate-spin text-neutral-400" />
+            </div>
+          ) : viewMode === "map" ? (
             <div className="relative z-0">
               <ProjectsMap
                 projects={filteredProjects}

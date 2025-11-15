@@ -1,11 +1,28 @@
 import { Check, Send } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
 export default function Newsletter() {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState("");
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const element = document.getElementById("newsletter");
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        // Start effect when the top of the element is in view
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+          setScrollY(window.scrollY);
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,12 +57,18 @@ export default function Newsletter() {
     <section id="newsletter" className="relative h-[500px] overflow-hidden">
       {/* Imagen de fondo con parallax */}
       <div
-        className="absolute inset-0 w-full h-full"
+        className="absolute inset-0 w-full h-[160%] bg-fixed"
         style={{
           backgroundImage:
-            "url(https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=1920)",
+            "url(https://images.pexels.com/photos/16456745/pexels-photo-16456745.jpeg)",
           backgroundSize: "cover",
           backgroundPosition: "center",
+          transform: `translateY(${
+            (scrollY -
+              (document.getElementById("newsletter")?.offsetTop || 0)) *
+            0.2
+          }px)`,
+          top: "-10%",
         }}
       />
 
