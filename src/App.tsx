@@ -13,6 +13,7 @@ import ProjectLanding from "./components/ProjectLanding";
 import { PageConfig, Project, supabase } from "./lib/supabase";
 import Admin from "./pages/Admin";
 import Login from "./pages/Login";
+import ResetPassword from "./pages/ResetPassword";
 import UserProfile from "./pages/UserProfile";
 
 type View =
@@ -21,7 +22,8 @@ type View =
   | "admin"
   | "profile"
   | "all-projects"
-  | "project-landing";
+  | "project-landing"
+  | "reset-password";
 
 function App() {
   const [view, setView] = useState<View>("home");
@@ -60,6 +62,7 @@ function App() {
   useEffect(() => {
     loadData();
     checkUser();
+    checkResetPassword();
 
     const handleScroll = () => {
       setScrollY(window.scrollY);
@@ -68,6 +71,16 @@ function App() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const checkResetPassword = () => {
+    // Verificar si la URL contiene un hash de recuperación de contraseña
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const type = hashParams.get("type");
+    
+    if (type === "recovery") {
+      setView("reset-password");
+    }
+  };
 
   const checkUser = async () => {
     try {
@@ -214,21 +227,23 @@ function App() {
 
   const handleLoginSuccess = async () => {
     await checkUser();
-    // Esperar un momento para que se actualice el estado
-    setTimeout(async () => {
-      const { data } = await supabase.auth.getUser();
-      if (data.user) {
-        const { data: roleData } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", data.user.id)
-          .maybeSingle();
-
-        const isUserAdmin = roleData?.role === "admin";
-        setView(isUserAdmin ? "admin" : "profile");
-      }
-    }, 100);
+    // Después de autenticarse, ir siempre al home
+    setView("home");
+    // Scroll al inicio de la página
+    if ((window as any).lenis) {
+      (window as any).lenis.scrollTo(0, { immediate: true });
+    }
   };
+
+  if (view === "reset-password") {
+    return (
+      <ResetPassword
+        onResetSuccess={() => {
+          setView("login");
+        }}
+      />
+    );
+  }
 
   if (view === "login") {
     return <Login onLoginSuccess={handleLoginSuccess} />;

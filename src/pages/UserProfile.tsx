@@ -6,6 +6,7 @@ import {
   LogOut,
   Menu,
   Trash2,
+  User,
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -34,6 +35,15 @@ interface Visit {
   created_at: string;
 }
 
+interface UserProfile {
+  id: string;
+  user_id: string;
+  first_name: string | null;
+  last_name: string | null;
+  phone: string | null;
+  address: string | null;
+}
+
 export default function UserProfile({
   onBackToHome,
   onViewProject,
@@ -42,7 +52,15 @@ export default function UserProfile({
   const [visits, setVisits] = useState<Visit[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [user, setUser] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<"favorites" | "visits">(
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    first_name: "",
+    last_name: "",
+    phone: "",
+    address: "",
+  });
+  const [activeTab, setActiveTab] = useState<"favorites" | "visits" | "profile">(
     "favorites"
   );
   const [isLoading, setIsLoading] = useState(true);
@@ -59,9 +77,10 @@ export default function UserProfile({
 
   useEffect(() => {
     if (user) {
+      loadUserProfile(user.id);
       if (activeTab === "favorites") {
         loadFavorites(user.id);
-      } else {
+      } else if (activeTab === "visits") {
         loadVisits(user.id);
       }
     }
@@ -85,6 +104,44 @@ export default function UserProfile({
   const loadProjects = async () => {
     const { data } = await supabase.from("projects").select("*");
     if (data) setProjects(data);
+  };
+
+  const loadUserProfile = async (userId: string) => {
+    const { data } = await supabase
+      .from("user_profiles")
+      .select("*")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (data) {
+      setUserProfile(data);
+      setProfileForm({
+        first_name: data.first_name || "",
+        last_name: data.last_name || "",
+        phone: data.phone || "",
+        address: data.address || "",
+      });
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    if (!user) return;
+
+    const { error } = await supabase.from("user_profiles").upsert({
+      user_id: user.id,
+      first_name: profileForm.first_name,
+      last_name: profileForm.last_name,
+      phone: profileForm.phone,
+      address: profileForm.address,
+    });
+
+    if (error) {
+      showNotification("Error al guardar el perfil", "error");
+    } else {
+      showNotification("Perfil actualizado exitosamente", "success");
+      setIsEditingProfile(false);
+      loadUserProfile(user.id);
+    }
   };
 
   const loadFavorites = async (userId: string) => {
@@ -250,7 +307,7 @@ export default function UserProfile({
       </header>
 
       <div className="mx-auto max-w-7xl p-6">
-        <div className="mb-6 flex gap-4">
+        <div className="mb-6 flex gap-4 flex-wrap">
           <button
             onClick={() => setActiveTab("favorites")}
             className={`flex items-center gap-2 px-6 py-3 text-sm tracking-wider transition-all ${
@@ -272,6 +329,17 @@ export default function UserProfile({
           >
             <Calendar className="h-4 w-4" strokeWidth={1.5} />
             VISITAS PENDIENTES
+          </button>
+          <button
+            onClick={() => setActiveTab("profile")}
+            className={`flex items-center gap-2 px-6 py-3 text-sm tracking-wider transition-all ${
+              activeTab === "profile"
+                ? "bg-neutral-900 text-white"
+                : "border border-neutral-300 text-neutral-600 hover:border-neutral-900"
+            }`}
+          >
+            <User className="h-4 w-4" strokeWidth={1.5} />
+            MIS DATOS
           </button>
         </div>
 
@@ -429,6 +497,146 @@ export default function UserProfile({
                 )}
               </>
             )}
+          </div>
+        )}
+
+        {activeTab === "profile" && (
+          <div className="rounded-lg bg-white p-6 shadow-sm">
+            <div className="mb-6 flex items-center justify-between">
+              <h2 className="text-2xl font-light tracking-wide">
+                Datos Personales
+              </h2>
+              {!isEditingProfile && (
+                <button
+                  onClick={() => setIsEditingProfile(true)}
+                  className="border border-neutral-900 px-6 py-2 text-sm tracking-wider transition-all hover:bg-neutral-900 hover:text-white"
+                >
+                  EDITAR
+                </button>
+              )}
+            </div>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label className="mb-2 block text-sm font-light tracking-wider text-neutral-700">
+                    NOMBRE
+                  </label>
+                  {isEditingProfile ? (
+                    <input
+                      type="text"
+                      value={profileForm.first_name}
+                      onChange={(e) =>
+                        setProfileForm({ ...profileForm, first_name: e.target.value })
+                      }
+                      className="w-full border border-neutral-300 bg-white px-4 py-3 font-light text-neutral-900 transition-colors focus:border-neutral-900 focus:outline-none"
+                      placeholder="Tu nombre"
+                    />
+                  ) : (
+                    <p className="px-4 py-3 font-light text-neutral-900">
+                      {userProfile?.first_name || "No especificado"}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-light tracking-wider text-neutral-700">
+                    APELLIDO
+                  </label>
+                  {isEditingProfile ? (
+                    <input
+                      type="text"
+                      value={profileForm.last_name}
+                      onChange={(e) =>
+                        setProfileForm({ ...profileForm, last_name: e.target.value })
+                      }
+                      className="w-full border border-neutral-300 bg-white px-4 py-3 font-light text-neutral-900 transition-colors focus:border-neutral-900 focus:outline-none"
+                      placeholder="Tu apellido"
+                    />
+                  ) : (
+                    <p className="px-4 py-3 font-light text-neutral-900">
+                      {userProfile?.last_name || "No especificado"}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-light tracking-wider text-neutral-700">
+                  EMAIL
+                </label>
+                <p className="px-4 py-3 font-light text-neutral-500 bg-neutral-50">
+                  {user?.email} (no editable)
+                </p>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-light tracking-wider text-neutral-700">
+                  TELÉFONO
+                </label>
+                {isEditingProfile ? (
+                  <input
+                    type="tel"
+                    value={profileForm.phone}
+                    onChange={(e) =>
+                      setProfileForm({ ...profileForm, phone: e.target.value })
+                    }
+                    className="w-full border border-neutral-300 bg-white px-4 py-3 font-light text-neutral-900 transition-colors focus:border-neutral-900 focus:outline-none"
+                    placeholder="+54 9 11 1234-5678"
+                  />
+                ) : (
+                  <p className="px-4 py-3 font-light text-neutral-900">
+                    {userProfile?.phone || "No especificado"}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-light tracking-wider text-neutral-700">
+                  DIRECCIÓN
+                </label>
+                {isEditingProfile ? (
+                  <textarea
+                    value={profileForm.address}
+                    onChange={(e) =>
+                      setProfileForm({ ...profileForm, address: e.target.value })
+                    }
+                    className="w-full border border-neutral-300 bg-white px-4 py-3 font-light text-neutral-900 transition-colors focus:border-neutral-900 focus:outline-none"
+                    placeholder="Tu dirección completa"
+                    rows={3}
+                  />
+                ) : (
+                  <p className="px-4 py-3 font-light text-neutral-900">
+                    {userProfile?.address || "No especificado"}
+                  </p>
+                )}
+              </div>
+
+              {isEditingProfile && (
+                <div className="flex gap-4">
+                  <button
+                    onClick={handleSaveProfile}
+                    className="flex-1 bg-neutral-900 px-6 py-3 text-sm tracking-wider text-white transition-all hover:bg-neutral-800"
+                  >
+                    GUARDAR CAMBIOS
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsEditingProfile(false);
+                      setProfileForm({
+                        first_name: userProfile?.first_name || "",
+                        last_name: userProfile?.last_name || "",
+                        phone: userProfile?.phone || "",
+                        address: userProfile?.address || "",
+                      });
+                    }}
+                    className="flex-1 border border-neutral-300 px-6 py-3 text-sm tracking-wider transition-all hover:border-neutral-900"
+                  >
+                    CANCELAR
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>

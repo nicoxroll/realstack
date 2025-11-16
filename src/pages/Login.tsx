@@ -9,10 +9,12 @@ interface LoginProps {
 export default function Login({ onLoginSuccess }: LoginProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [mode, setMode] = useState<"login" | "signup" | "forgot-password">("login");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,7 +22,32 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     setError("");
 
     try {
-      if (mode === "signup") {
+      if (mode === "forgot-password") {
+        const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+          email,
+          {
+            redirectTo: `${window.location.origin}/#type=recovery`,
+          }
+        );
+
+        if (resetError) {
+          throw resetError;
+        }
+
+        setError(
+          "Revisa tu email. Te hemos enviado un enlace para restablecer tu contraseña."
+        );
+        setTimeout(() => {
+          setMode("login");
+          setError("");
+        }, 3000);
+      } else if (mode === "signup") {
+        if (password !== confirmPassword) {
+          setError("Las contraseñas no coinciden");
+          setIsLoading(false);
+          return;
+        }
+
         const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
@@ -39,9 +66,11 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             onLoginSuccess();
           } else {
             setError(
-              "Usuario creado. Revisa tu email para confirmar la cuenta."
+              "Usuario creado. Revisa tu email para confirmar la cuenta antes de iniciar sesión."
             );
-            setMode("login");
+            setTimeout(() => {
+              setMode("login");
+            }, 3000);
           }
         }
       } else {
@@ -89,12 +118,14 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             <Lock className="h-8 w-8 text-white" strokeWidth={1.5} />
           </div>
           <h1 className="mb-2 text-3xl font-light tracking-wide text-white">
-            Administración
+            {mode === "forgot-password" ? "Recuperar Contraseña" : "Administración"}
           </h1>
           <p className="text-sm font-light text-white/80">
             {mode === "login"
               ? "Ingresa tus credenciales para continuar"
-              : "Crea tu cuenta"}
+              : mode === "signup"
+              ? "Crea tu cuenta"
+              : "Ingresa tu email para restablecer tu contraseña"}
           </p>
         </div>
 
@@ -124,46 +155,86 @@ export default function Login({ onLoginSuccess }: LoginProps) {
               </div>
             </div>
 
-            <div>
-              <label
-                htmlFor="password"
-                className="mb-2 block text-sm font-light tracking-wider text-neutral-700"
-              >
-                CONTRASEÑA
-              </label>
-              <div className="relative">
-                <Lock
-                  className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400"
-                  strokeWidth={1.5}
-                />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  id="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full border border-neutral-300 bg-white py-3 pl-12 pr-12 font-light text-neutral-900 transition-colors focus:border-neutral-900 focus:outline-none"
-                  placeholder="••••••••"
-                  minLength={6}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 transition-colors hover:text-neutral-600"
+            {mode !== "forgot-password" && (
+              <div>
+                <label
+                  htmlFor="password"
+                  className="mb-2 block text-sm font-light tracking-wider text-neutral-700"
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" strokeWidth={1.5} />
-                  ) : (
-                    <Eye className="h-5 w-5" strokeWidth={1.5} />
-                  )}
-                </button>
+                  CONTRASEÑA
+                </label>
+                <div className="relative">
+                  <Lock
+                    className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400"
+                    strokeWidth={1.5}
+                  />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full border border-neutral-300 bg-white py-3 pl-12 pr-12 font-light text-neutral-900 transition-colors focus:border-neutral-900 focus:outline-none"
+                    placeholder="••••••••"
+                    minLength={6}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 transition-colors hover:text-neutral-600"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" strokeWidth={1.5} />
+                    ) : (
+                      <Eye className="h-5 w-5" strokeWidth={1.5} />
+                    )}
+                  </button>
+                </div>
+                {mode === "signup" && (
+                  <p className="mt-1 text-xs font-light text-neutral-500">
+                    Mínimo 6 caracteres
+                  </p>
+                )}
               </div>
-              {mode === "signup" && (
-                <p className="mt-1 text-xs font-light text-neutral-500">
-                  Mínimo 6 caracteres
-                </p>
-              )}
-            </div>
+            )}
+
+            {mode === "signup" && (
+              <div>
+                <label
+                  htmlFor="confirmPassword"
+                  className="mb-2 block text-sm font-light tracking-wider text-neutral-700"
+                >
+                  CONFIRMAR CONTRASEÑA
+                </label>
+                <div className="relative">
+                  <Lock
+                    className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400"
+                    strokeWidth={1.5}
+                  />
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    id="confirmPassword"
+                    required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full border border-neutral-300 bg-white py-3 pl-12 pr-12 font-light text-neutral-900 transition-colors focus:border-neutral-900 focus:outline-none"
+                    placeholder="••••••••"
+                    minLength={6}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 transition-colors hover:text-neutral-600"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-5 w-5" strokeWidth={1.5} />
+                    ) : (
+                      <Eye className="h-5 w-5" strokeWidth={1.5} />
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
 
             {error && (
               <div
@@ -185,18 +256,34 @@ export default function Login({ onLoginSuccess }: LoginProps) {
               {isLoading
                 ? mode === "login"
                   ? "INICIANDO SESIÓN..."
-                  : "CREANDO CUENTA..."
+                  : mode === "signup"
+                  ? "CREANDO CUENTA..."
+                  : "ENVIANDO EMAIL..."
                 : mode === "login"
                 ? "INICIAR SESIÓN"
-                : "CREAR CUENTA"}
+                : mode === "signup"
+                ? "CREAR CUENTA"
+                : "ENVIAR ENLACE"}
             </button>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="mt-6 space-y-3 text-center">
+            {mode === "login" && (
+              <button
+                onClick={() => {
+                  setMode("forgot-password");
+                  setError("");
+                }}
+                className="block w-full text-sm font-light text-neutral-600 transition-colors hover:text-neutral-900"
+              >
+                ¿Olvidaste tu contraseña?
+              </button>
+            )}
             <button
               onClick={() => {
                 setMode(mode === "login" ? "signup" : "login");
                 setError("");
+                setConfirmPassword("");
               }}
               className="text-sm font-light text-neutral-600 transition-colors hover:text-neutral-900"
             >
