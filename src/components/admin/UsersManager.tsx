@@ -53,8 +53,15 @@ export default function UsersManager({ onUpdate }: UsersManagerProps) {
     if (currentRole === newRole) return;
 
     // Validar que el nuevo rol sea válido
-    if (!['admin', 'user', 'client'].includes(newRole)) {
-      console.error("Rol inválido:", newRole, "Tipo:", typeof newRole, "Length:", newRole.length);
+    if (!["admin", "user", "client"].includes(newRole)) {
+      console.error(
+        "Rol inválido:",
+        newRole,
+        "Tipo:",
+        typeof newRole,
+        "Length:",
+        newRole.length
+      );
       showNotification("Rol inválido seleccionado", "error");
       return;
     }
@@ -106,7 +113,6 @@ export default function UsersManager({ onUpdate }: UsersManagerProps) {
           Gestión de Usuarios
         </h2>
       </div>
-
       <div className="mb-6 flex items-center gap-4">
         <div className="relative flex-1">
           <Search
@@ -122,7 +128,6 @@ export default function UsersManager({ onUpdate }: UsersManagerProps) {
           />
         </div>
       </div>
-
       <div className="-mx-4 md:-mx-0">
         <div className="overflow-x-auto">
           <div className="inline-block min-w-full align-middle">
@@ -149,18 +154,21 @@ export default function UsersManager({ onUpdate }: UsersManagerProps) {
                       </div>
                     </td>
                     <td className="px-3 md:px-6 py-3 text-xs md:text-sm font-light">
-                      {user.role === "admin" ? "ADMIN" : user.role === "client" ? "CLIENTE" : "USUARIO"}
+                      {user.role === "admin"
+                        ? "ADMIN"
+                        : user.role === "client"
+                        ? "CLIENTE"
+                        : "USUARIO"}
                     </td>
                     <td className="px-3 md:px-6 py-3 text-right">
                       <select
                         value={user.role}
                         onChange={(e) => {
-                          const cleanValue = e.target.value.trim() as "admin" | "user" | "client";
-                          handleChangeRole(
-                            user.user_id,
-                            user.role,
-                            cleanValue
-                          );
+                          const cleanValue = e.target.value.trim() as
+                            | "admin"
+                            | "user"
+                            | "client";
+                          handleChangeRole(user.user_id, user.role, cleanValue);
                         }}
                         className="border border-neutral-300 px-2 md:px-3 py-1 text-xs transition-all hover:border-neutral-900 focus:border-neutral-900 focus:outline-none w-full md:w-auto"
                       >
@@ -175,7 +183,8 @@ export default function UsersManager({ onUpdate }: UsersManagerProps) {
             </table>
           </div>
         </div>
-      </div>      <div className="mt-6 space-y-4">
+      </div>{" "}
+      <div className="mt-6 space-y-4">
         <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
           <p className="text-sm font-light text-blue-900">
             <strong>Información:</strong> Aquí puedes ver todos los usuarios

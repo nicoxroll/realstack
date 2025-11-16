@@ -82,9 +82,14 @@ export default function AppointmentCalendar({
   useEffect(() => {
     if (selectedDate) {
       loadExistingAppointments();
-      generateAvailableSlots();
     }
   }, [selectedDate, availability]);
+
+  useEffect(() => {
+    if (selectedDate && existingAppointments.length >= 0) {
+      generateAvailableSlots();
+    }
+  }, [selectedDate, availability, existingAppointments]);
 
   const checkUser = async () => {
     const {
@@ -285,6 +290,10 @@ export default function AppointmentCalendar({
       }
 
       showNotification("¡Turno modificado exitosamente!", "success");
+      
+      // Recargar turnos existentes para actualizar la disponibilidad
+      await loadExistingAppointments();
+      
       setTimeout(() => {
         onClose();
       }, 1500);
@@ -341,6 +350,10 @@ export default function AppointmentCalendar({
     }
 
     showNotification("¡Turno agendado exitosamente!", "success");
+    
+    // Recargar turnos existentes para actualizar la disponibilidad
+    await loadExistingAppointments();
+    
     setTimeout(() => {
       onClose();
     }, 1500);
@@ -452,41 +465,25 @@ export default function AppointmentCalendar({
               </div>
             ) : (
               <div className="grid max-h-96 grid-cols-2 gap-2 overflow-y-auto">
-                {availableSlots.map((slot) => {
-                  const isBooked = slot.includes(":booked");
-                  const isPast = slot.includes(":past");
-                  const timeValue = slot.split(":").slice(0, 2).join(":");
-                  const isDisabled = isBooked || isPast;
+                {availableSlots
+                  .filter((slot) => !slot.includes(":booked") && !slot.includes(":past"))
+                  .map((slot) => {
+                    const timeValue = slot.split(":").slice(0, 2).join(":");
 
-                  return (
-                    <button
-                      key={slot}
-                      onClick={() => !isDisabled && setSelectedTime(timeValue)}
-                      disabled={isDisabled}
-                      className={`border p-3 text-sm font-light transition-all relative ${
-                        isDisabled
-                          ? "cursor-not-allowed border-neutral-200 bg-neutral-50 text-neutral-300 line-through"
-                          : selectedTime === timeValue
-                          ? "border-neutral-900 bg-neutral-900 text-white"
-                          : "border-neutral-300 hover:border-neutral-900 hover:bg-neutral-50"
-                      }`}
-                    >
-                      <span className={isDisabled ? "opacity-40" : ""}>
+                    return (
+                      <button
+                        key={slot}
+                        onClick={() => setSelectedTime(timeValue)}
+                        className={`border p-3 text-sm font-light transition-all ${
+                          selectedTime === timeValue
+                            ? "border-neutral-900 bg-neutral-900 text-white"
+                            : "border-neutral-300 hover:border-neutral-900"
+                        }`}
+                      >
                         {timeValue}
-                      </span>
-                      {isBooked && (
-                        <span className="block text-xs mt-1 opacity-50">
-                          Reservado
-                        </span>
-                      )}
-                      {isPast && (
-                        <span className="block text-xs mt-1 opacity-50">
-                          No disponible
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
+                      </button>
+                    );
+                  })}
               </div>
             )}
 

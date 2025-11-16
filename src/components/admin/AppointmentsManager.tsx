@@ -189,7 +189,6 @@ export default function AppointmentsManager({
           Gestión de Turnos
         </h2>
       </div>
-
       {/* Tabs */}
       <div className="mb-6 flex gap-4 border-b border-neutral-200">
         <button
@@ -215,7 +214,6 @@ export default function AppointmentsManager({
           AGENDADOS
         </button>
       </div>
-
       {/* Contenido de Disponibilidad */}
       {activeTab === "availability" && (
         <div>
@@ -247,70 +245,71 @@ export default function AppointmentsManager({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-neutral-100 bg-white">
-                      {availability.map((config) => (
-                        <tr key={config.id}>
-                          <td className="px-3 md:px-6 py-3 text-xs md:text-sm font-light">
-                            <div className="max-w-[70px] md:max-w-none truncate">
-                              {dayNames[config.day_of_week]}
-                            </div>
-                          </td>
-                          <td className="px-3 md:px-6 py-3 text-xs md:text-sm font-light">
-                            <input
-                              type="time"
-                              value={config.start_time}
-                              onChange={(e) =>
-                                handleUpdateAvailability(
-                                  config.day_of_week,
-                                  "start_time",
-                                  e.target.value
-                                )
-                              }
-                              className="border border-neutral-300 px-1 md:px-2 py-1 text-xs font-light outline-none transition-all focus:border-neutral-900 w-full max-w-[80px] md:max-w-[110px]"
-                              disabled={!config.is_available}
-                            />
-                          </td>
-                          <td className="px-3 md:px-6 py-3 text-xs md:text-sm font-light">
-                            <input
-                              type="time"
-                              value={config.end_time}
-                              onChange={(e) =>
-                                handleUpdateAvailability(
-                                  config.day_of_week,
-                                  "end_time",
-                                  e.target.value
-                                )
-                              }
-                              className="border border-neutral-300 px-1 md:px-2 py-1 text-xs font-light outline-none transition-all focus:border-neutral-900 w-full max-w-[80px] md:max-w-[110px]"
-                              disabled={!config.is_available}
-                            />
-                          </td>
-                          <td className="px-3 md:px-6 py-3 text-xs md:text-sm font-light">
-                            <button
-                              onClick={() =>
-                                handleUpdateAvailability(
-                                  config.day_of_week,
-                                  "is_available",
-                                  !config.is_available
-                                )
-                              }
-                              className={`px-2 md:px-3 py-1 text-xs transition-all ${
-                                config.is_available
-                                  ? "border border-green-500 text-green-600 hover:bg-green-50"
-                                  : "border border-neutral-300 text-neutral-500 hover:bg-neutral-50"
-                              }`}
-                            >
-                              {config.is_available ? "SÍ" : "NO"}
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
+                    {availability.map((config) => (
+                      <tr key={config.id}>
+                        <td className="px-3 md:px-6 py-3 text-xs md:text-sm font-light">
+                          <div className="max-w-[70px] md:max-w-none truncate">
+                            {dayNames[config.day_of_week]}
+                          </div>
+                        </td>
+                        <td className="px-3 md:px-6 py-3 text-xs md:text-sm font-light">
+                          <input
+                            type="time"
+                            value={config.start_time}
+                            onChange={(e) =>
+                              handleUpdateAvailability(
+                                config.day_of_week,
+                                "start_time",
+                                e.target.value
+                              )
+                            }
+                            className="border border-neutral-300 px-1 md:px-2 py-1 text-xs font-light outline-none transition-all focus:border-neutral-900 w-full max-w-[80px] md:max-w-[110px]"
+                            disabled={!config.is_available}
+                          />
+                        </td>
+                        <td className="px-3 md:px-6 py-3 text-xs md:text-sm font-light">
+                          <input
+                            type="time"
+                            value={config.end_time}
+                            onChange={(e) =>
+                              handleUpdateAvailability(
+                                config.day_of_week,
+                                "end_time",
+                                e.target.value
+                              )
+                            }
+                            className="border border-neutral-300 px-1 md:px-2 py-1 text-xs font-light outline-none transition-all focus:border-neutral-900 w-full max-w-[80px] md:max-w-[110px]"
+                            disabled={!config.is_available}
+                          />
+                        </td>
+                        <td className="px-3 md:px-6 py-3 text-xs md:text-sm font-light">
+                          <button
+                            onClick={() =>
+                              handleUpdateAvailability(
+                                config.day_of_week,
+                                "is_available",
+                                !config.is_available
+                              )
+                            }
+                            className={`px-2 md:px-3 py-1 text-xs transition-all ${
+                              config.is_available
+                                ? "border border-green-500 text-green-600 hover:bg-green-50"
+                                : "border border-neutral-300 text-neutral-500 hover:bg-neutral-50"
+                            }`}
+                          >
+                            {config.is_available ? "SÍ" : "NO"}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
             </div>
           </div>
         </div>
-      )}      {/* Contenido de Turnos Agendados */}
+      )}{" "}
+      {/* Contenido de Turnos Agendados */}
       {activeTab === "appointments" && (
         <div>
           <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
@@ -330,115 +329,115 @@ export default function AppointmentsManager({
                 ) : (
                   <table className="min-w-full divide-y divide-neutral-200 border border-neutral-200 rounded-lg overflow-hidden mx-4 md:mx-0">
                     <thead className="bg-neutral-50">
-                        <tr>
-                          <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-light tracking-wider text-neutral-600">
-                            Fecha
-                          </th>
-                          <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-light tracking-wider text-neutral-600">
-                            Horario
-                          </th>
-                          <th className="hidden md:table-cell px-6 py-3 text-left text-sm font-light tracking-wider text-neutral-600">
-                            Usuario
-                          </th>
-                          <th className="hidden lg:table-cell px-6 py-3 text-left text-sm font-light tracking-wider text-neutral-600">
-                            Proyecto
-                          </th>
-                          <th className="px-3 md:px-6 py-3 text-center text-xs md:text-sm font-light tracking-wider text-neutral-600">
-                            Estado
-                          </th>
-                          <th className="px-3 md:px-6 py-3 text-right text-xs md:text-sm font-light tracking-wider text-neutral-600">
-                            Acciones
-                          </th>
+                      <tr>
+                        <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-light tracking-wider text-neutral-600">
+                          Fecha
+                        </th>
+                        <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-light tracking-wider text-neutral-600">
+                          Horario
+                        </th>
+                        <th className="hidden md:table-cell px-6 py-3 text-left text-sm font-light tracking-wider text-neutral-600">
+                          Usuario
+                        </th>
+                        <th className="hidden lg:table-cell px-6 py-3 text-left text-sm font-light tracking-wider text-neutral-600">
+                          Proyecto
+                        </th>
+                        <th className="px-3 md:px-6 py-3 text-center text-xs md:text-sm font-light tracking-wider text-neutral-600">
+                          Estado
+                        </th>
+                        <th className="px-3 md:px-6 py-3 text-right text-xs md:text-sm font-light tracking-wider text-neutral-600">
+                          Acciones
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-neutral-100 bg-white">
                       {appointments.map((appointment) => (
-                          <tr key={appointment.id}>
-                            <td className="px-3 md:px-6 py-3 text-xs md:text-sm font-light">
-                              {new Date(
-                                appointment.appointment_date
-                              ).toLocaleDateString("es-AR", {
-                                day: "numeric",
-                                month: "short",
-                              })}
-                            </td>
-                            <td className="px-3 md:px-6 py-3 text-xs md:text-sm font-light">
-                              {appointment.start_time.slice(0, 5)}
-                            </td>
-                            <td className="hidden md:table-cell px-6 py-3 text-sm font-light">
-                              <div className="truncate max-w-[150px]">
-                                {appointment.user_email || "N/A"}
-                              </div>
-                            </td>
-                            <td className="hidden lg:table-cell px-6 py-3 text-sm font-light">
-                              <div className="truncate max-w-[150px]">
-                                {appointment.project_name || "N/A"}
-                              </div>
-                            </td>
-                            <td className="px-3 md:px-6 py-3 text-xs md:text-sm font-light">
-                              {appointment.status === "scheduled" && "Agendado"}
-                              {appointment.status === "confirmed" && "Confirmado"}
-                              {appointment.status === "cancelled" && "Cancelado"}
-                              {appointment.status === "completed" && "Completado"}
-                            </td>
-                            <td className="px-3 md:px-6 py-3 text-right">
-                              <div className="flex justify-end gap-1">
-                                {appointment.status === "scheduled" && (
+                        <tr key={appointment.id}>
+                          <td className="px-3 md:px-6 py-3 text-xs md:text-sm font-light">
+                            {new Date(
+                              appointment.appointment_date
+                            ).toLocaleDateString("es-AR", {
+                              day: "numeric",
+                              month: "short",
+                            })}
+                          </td>
+                          <td className="px-3 md:px-6 py-3 text-xs md:text-sm font-light">
+                            {appointment.start_time.slice(0, 5)}
+                          </td>
+                          <td className="hidden md:table-cell px-6 py-3 text-sm font-light">
+                            <div className="truncate max-w-[150px]">
+                              {appointment.user_email || "N/A"}
+                            </div>
+                          </td>
+                          <td className="hidden lg:table-cell px-6 py-3 text-sm font-light">
+                            <div className="truncate max-w-[150px]">
+                              {appointment.project_name || "N/A"}
+                            </div>
+                          </td>
+                          <td className="px-3 md:px-6 py-3 text-xs md:text-sm font-light">
+                            {appointment.status === "scheduled" && "Agendado"}
+                            {appointment.status === "confirmed" && "Confirmado"}
+                            {appointment.status === "cancelled" && "Cancelado"}
+                            {appointment.status === "completed" && "Completado"}
+                          </td>
+                          <td className="px-3 md:px-6 py-3 text-right">
+                            <div className="flex justify-end gap-1">
+                              {appointment.status === "scheduled" && (
+                                <button
+                                  onClick={() =>
+                                    handleUpdateAppointmentStatus(
+                                      appointment.id,
+                                      "confirmed"
+                                    )
+                                  }
+                                  className="border border-green-500 p-1.5 md:p-2 text-green-600 transition-all hover:bg-green-50"
+                                  title="Confirmar"
+                                >
+                                  <Check
+                                    className="h-3.5 w-3.5 md:h-4 md:w-4"
+                                    strokeWidth={1.5}
+                                  />
+                                </button>
+                              )}
+                              {(appointment.status === "scheduled" ||
+                                appointment.status === "confirmed") && (
+                                <>
                                   <button
                                     onClick={() =>
                                       handleUpdateAppointmentStatus(
                                         appointment.id,
-                                        "confirmed"
+                                        "completed"
                                       )
                                     }
-                                    className="border border-green-500 p-1.5 md:p-2 text-green-600 transition-all hover:bg-green-50"
-                                    title="Confirmar"
+                                    className="border border-blue-500 p-1.5 md:p-2 text-blue-600 transition-all hover:bg-blue-50"
+                                    title="Marcar como completado"
                                   >
-                                    <Check
+                                    <CheckCircle
                                       className="h-3.5 w-3.5 md:h-4 md:w-4"
                                       strokeWidth={1.5}
                                     />
                                   </button>
-                                )}
-                                {(appointment.status === "scheduled" ||
-                                  appointment.status === "confirmed") && (
-                                  <>
-                                    <button
-                                      onClick={() =>
-                                        handleUpdateAppointmentStatus(
-                                          appointment.id,
-                                          "completed"
-                                        )
-                                      }
-                                      className="border border-blue-500 p-1.5 md:p-2 text-blue-600 transition-all hover:bg-blue-50"
-                                      title="Marcar como completado"
-                                    >
-                                      <CheckCircle
-                                        className="h-3.5 w-3.5 md:h-4 md:w-4"
-                                        strokeWidth={1.5}
-                                      />
-                                    </button>
-                                    <button
-                                      onClick={() =>
-                                        handleUpdateAppointmentStatus(
-                                          appointment.id,
-                                          "cancelled"
-                                        )
-                                      }
-                                      className="border border-red-500 p-1.5 md:p-2 text-red-600 transition-all hover:bg-red-50"
-                                      title="Cancelar"
-                                    >
-                                      <X
-                                        className="h-3.5 w-3.5 md:h-4 md:w-4"
-                                        strokeWidth={1.5}
-                                      />
-                                    </button>
-                                  </>
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
+                                  <button
+                                    onClick={() =>
+                                      handleUpdateAppointmentStatus(
+                                        appointment.id,
+                                        "cancelled"
+                                      )
+                                    }
+                                    className="border border-red-500 p-1.5 md:p-2 text-red-600 transition-all hover:bg-red-50"
+                                    title="Cancelar"
+                                  >
+                                    <X
+                                      className="h-3.5 w-3.5 md:h-4 md:w-4"
+                                      strokeWidth={1.5}
+                                    />
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 )}
