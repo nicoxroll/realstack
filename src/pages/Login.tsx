@@ -14,7 +14,9 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [mode, setMode] = useState<"login" | "signup" | "forgot-password">("login");
+  const [mode, setMode] = useState<"login" | "signup" | "forgot-password">(
+    "login"
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,7 +120,9 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             <Lock className="h-8 w-8 text-white" strokeWidth={1.5} />
           </div>
           <h1 className="mb-2 text-3xl font-light tracking-wide text-white">
-            {mode === "forgot-password" ? "Recuperar Contraseña" : "Administración"}
+            {mode === "forgot-password"
+              ? "Recuperar Contraseña"
+              : "Administración"}
           </h1>
           <p className="text-sm font-light text-white/80">
             {mode === "login"

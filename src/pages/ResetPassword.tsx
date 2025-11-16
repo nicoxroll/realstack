@@ -22,7 +22,9 @@ export default function ResetPassword({ onResetSuccess }: ResetPasswordProps) {
     const type = hashParams.get("type");
 
     if (!accessToken || type !== "recovery") {
-      setError("Enlace inválido o expirado. Solicita un nuevo enlace de recuperación.");
+      setError(
+        "Enlace inválido o expirado. Solicita un nuevo enlace de recuperación."
+      );
     }
   }, []);
 

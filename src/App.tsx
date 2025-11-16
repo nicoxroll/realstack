@@ -76,7 +76,7 @@ function App() {
     // Verificar si la URL contiene un hash de recuperación de contraseña
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
     const type = hashParams.get("type");
-    
+
     if (type === "recovery") {
       setView("reset-password");
     }

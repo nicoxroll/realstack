@@ -60,9 +60,9 @@ export default function UserProfile({
     phone: "",
     address: "",
   });
-  const [activeTab, setActiveTab] = useState<"favorites" | "visits" | "profile">(
-    "favorites"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "favorites" | "visits" | "profile"
+  >("favorites");
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingFavorites, setIsLoadingFavorites] = useState(true);
   const [isLoadingVisits, setIsLoadingVisits] = useState(true);
@@ -527,7 +527,10 @@ export default function UserProfile({
                       type="text"
                       value={profileForm.first_name}
                       onChange={(e) =>
-                        setProfileForm({ ...profileForm, first_name: e.target.value })
+                        setProfileForm({
+                          ...profileForm,
+                          first_name: e.target.value,
+                        })
                       }
                       className="w-full border border-neutral-300 bg-white px-4 py-3 font-light text-neutral-900 transition-colors focus:border-neutral-900 focus:outline-none"
                       placeholder="Tu nombre"
@@ -548,7 +551,10 @@ export default function UserProfile({
                       type="text"
                       value={profileForm.last_name}
                       onChange={(e) =>
-                        setProfileForm({ ...profileForm, last_name: e.target.value })
+                        setProfileForm({
+                          ...profileForm,
+                          last_name: e.target.value,
+                        })
                       }
                       className="w-full border border-neutral-300 bg-white px-4 py-3 font-light text-neutral-900 transition-colors focus:border-neutral-900 focus:outline-none"
                       placeholder="Tu apellido"
@@ -599,7 +605,10 @@ export default function UserProfile({
                   <textarea
                     value={profileForm.address}
                     onChange={(e) =>
-                      setProfileForm({ ...profileForm, address: e.target.value })
+                      setProfileForm({
+                        ...profileForm,
+                        address: e.target.value,
+                      })
                     }
                     className="w-full border border-neutral-300 bg-white px-4 py-3 font-light text-neutral-900 transition-colors focus:border-neutral-900 focus:outline-none"
                     placeholder="Tu dirección completa"
