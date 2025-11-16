@@ -281,9 +281,6 @@ export default function AllProjects({
                           USD {project.price_from.toLocaleString()}
                         </p>
                       </div>
-                      <button className="border border-neutral-900 bg-neutral-900 px-8 py-3 text-sm tracking-wider text-white transition-all hover:bg-transparent hover:text-neutral-900">
-                        VER DETALLES
-                      </button>
                     </div>
                   </div>
                 </div>
