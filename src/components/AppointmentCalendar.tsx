@@ -290,10 +290,10 @@ export default function AppointmentCalendar({
       }
 
       showNotification("¡Turno modificado exitosamente!", "success");
-      
+
       // Recargar turnos existentes para actualizar la disponibilidad
       await loadExistingAppointments();
-      
+
       setTimeout(() => {
         onClose();
       }, 1500);
@@ -350,10 +350,10 @@ export default function AppointmentCalendar({
     }
 
     showNotification("¡Turno agendado exitosamente!", "success");
-    
+
     // Recargar turnos existentes para actualizar la disponibilidad
     await loadExistingAppointments();
-    
+
     setTimeout(() => {
       onClose();
     }, 1500);
@@ -466,7 +466,10 @@ export default function AppointmentCalendar({
             ) : (
               <div className="grid max-h-96 grid-cols-2 gap-2 overflow-y-auto">
                 {availableSlots
-                  .filter((slot) => !slot.includes(":booked") && !slot.includes(":past"))
+                  .filter(
+                    (slot) =>
+                      !slot.includes(":booked") && !slot.includes(":past")
+                  )
                   .map((slot) => {
                     const timeValue = slot.split(":").slice(0, 2).join(":");
 
