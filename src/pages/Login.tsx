@@ -1,32 +1,32 @@
-import { useState } from 'react';
-import { supabase } from '../lib/supabase';
-import { Lock, Mail, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { useState } from "react";
+import { supabase } from "../lib/supabase";
 
 interface LoginProps {
   onLoginSuccess: () => void;
 }
 
 export default function Login({ onLoginSuccess }: LoginProps) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [mode, setMode] = useState<'login' | 'signup'>('login');
+  const [error, setError] = useState("");
+  const [mode, setMode] = useState<"login" | "signup">("login");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
-      if (mode === 'signup') {
+      if (mode === "signup") {
         const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
           options: {
             emailRedirectTo: window.location.origin,
-          }
+          },
         });
 
         if (signUpError) {
@@ -38,15 +38,18 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           if (data.user.confirmed_at || data.session) {
             onLoginSuccess();
           } else {
-            setError('Usuario creado. Revisa tu email para confirmar la cuenta.');
-            setMode('login');
+            setError(
+              "Usuario creado. Revisa tu email para confirmar la cuenta."
+            );
+            setMode("login");
           }
         }
       } else {
-        const { data, error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+        const { data, error: signInError } =
+          await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
 
         if (signInError) {
           throw signInError;
@@ -57,11 +60,11 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         }
       }
     } catch (err) {
-      console.error('Error de autenticación:', err);
+      console.error("Error de autenticación:", err);
       setError(
-        err instanceof Error 
-          ? err.message 
-          : 'Error de autenticación. Verifica tus credenciales.'
+        err instanceof Error
+          ? err.message
+          : "Error de autenticación. Verifica tus credenciales."
       );
     } finally {
       setIsLoading(false);
@@ -71,14 +74,15 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   return (
     <div className="relative flex min-h-screen items-center justify-center px-6">
       {/* Imagen de fondo */}
-      <div 
+      <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundImage: 'url(https://images.pexels.com/photos/280222/pexels-photo-280222.jpeg?auto=compress&cs=tinysrgb&w=1920)',
+          backgroundImage:
+            "url(https://images.pexels.com/photos/280222/pexels-photo-280222.jpeg?auto=compress&cs=tinysrgb&w=1920)",
         }}
       />
       <div className="absolute inset-0 bg-black/50" />
-      
+
       <div className="relative z-10 w-full max-w-md">
         <div className="mb-8 text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center bg-white/10 backdrop-blur-md">
@@ -88,9 +92,9 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             Administración
           </h1>
           <p className="text-sm font-light text-white/80">
-            {mode === 'login' 
-              ? 'Ingresa tus credenciales para continuar'
-              : 'Crea tu cuenta de administrador'}
+            {mode === "login"
+              ? "Ingresa tus credenciales para continuar"
+              : "Crea tu cuenta"}
           </p>
         </div>
 
@@ -133,7 +137,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                   strokeWidth={1.5}
                 />
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   id="password"
                   required
                   value={password}
@@ -154,7 +158,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                   )}
                 </button>
               </div>
-              {mode === 'signup' && (
+              {mode === "signup" && (
                 <p className="mt-1 text-xs font-light text-neutral-500">
                   Mínimo 6 caracteres
                 </p>
@@ -162,11 +166,13 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             </div>
 
             {error && (
-              <div className={`rounded-sm p-4 text-sm font-light ${
-                error.includes('Revisa tu email') 
-                  ? 'bg-green-50 text-green-800'
-                  : 'bg-red-50 text-red-800'
-              }`}>
+              <div
+                className={`rounded-sm p-4 text-sm font-light ${
+                  error.includes("Revisa tu email")
+                    ? "bg-green-50 text-green-800"
+                    : "bg-red-50 text-red-800"
+                }`}
+              >
                 {error}
               </div>
             )}
@@ -176,29 +182,33 @@ export default function Login({ onLoginSuccess }: LoginProps) {
               disabled={isLoading}
               className="w-full bg-neutral-900 py-4 font-light tracking-wider text-white transition-all hover:bg-neutral-800 disabled:bg-neutral-400"
             >
-              {isLoading 
-                ? (mode === 'login' ? 'INICIANDO SESIÓN...' : 'CREANDO CUENTA...') 
-                : (mode === 'login' ? 'INICIAR SESIÓN' : 'CREAR CUENTA')}
+              {isLoading
+                ? mode === "login"
+                  ? "INICIANDO SESIÓN..."
+                  : "CREANDO CUENTA..."
+                : mode === "login"
+                ? "INICIAR SESIÓN"
+                : "CREAR CUENTA"}
             </button>
           </form>
 
           <div className="mt-6 text-center">
             <button
               onClick={() => {
-                setMode(mode === 'login' ? 'signup' : 'login');
-                setError('');
+                setMode(mode === "login" ? "signup" : "login");
+                setError("");
               }}
               className="text-sm font-light text-neutral-600 transition-colors hover:text-neutral-900"
             >
-              {mode === 'login' 
-                ? '¿No tienes cuenta? Crear cuenta de administrador'
-                : '¿Ya tienes cuenta? Iniciar sesión'}
+              {mode === "login"
+                ? "¿No tienes cuenta? Crear cuenta de RealStack"
+                : "¿Ya tienes cuenta? Iniciar sesión"}
             </button>
           </div>
         </div>
 
         <p className="mt-6 text-center text-xs font-light text-white/60">
-          Acceso exclusivo para administradores autorizados
+          Todos los derechos reservados © 2025 RealStack
         </p>
       </div>
     </div>
