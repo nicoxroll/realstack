@@ -199,20 +199,25 @@ export default function AllProjects({
                 <Home className="h-16 w-16 text-neutral-400" strokeWidth={1} />
               </div>
               <h3 className="mb-3 text-2xl font-light tracking-wide text-neutral-900">
-                No se encontraron proyectos
+                {projects.length === 0
+                  ? "No hay proyectos disponibles"
+                  : "No se encontraron proyectos"}
               </h3>
               <p className="mb-8 max-w-md text-center font-light text-neutral-600">
-                No hay proyectos que coincidan con los filtros seleccionados.
-                Intenta ajustar tus criterios de búsqueda.
+                {projects.length === 0
+                  ? "No se pudieron cargar los proyectos. Por favor, verifica tu conexión e inténtalo nuevamente."
+                  : "No hay proyectos que coincidan con los filtros seleccionados. Intenta ajustar tus criterios de búsqueda."}
               </p>
-              <button
-                onClick={() => {
-                  setFilters({});
-                }}
-                className="border border-neutral-900 bg-neutral-900 px-8 py-3 text-sm tracking-wider text-white transition-all hover:bg-transparent hover:text-neutral-900"
-              >
-                LIMPIAR FILTROS
-              </button>
+              {projects.length > 0 && (
+                <button
+                  onClick={() => {
+                    setFilters({});
+                  }}
+                  className="border border-neutral-900 bg-neutral-900 px-8 py-3 text-sm tracking-wider text-white transition-all hover:bg-transparent hover:text-neutral-900"
+                >
+                  LIMPIAR FILTROS
+                </button>
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2">

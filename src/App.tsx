@@ -70,49 +70,91 @@ function App() {
   }, []);
 
   const checkUser = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (user) {
-      setUser(user);
-      console.log("Usuario autenticado:", user.email);
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        setUser(user);
+        console.log("Usuario autenticado:", user.email);
 
-      // Verificar el rol del usuario desde la base de datos
-      const { data: roleData, error } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .maybeSingle();
+        // Verificar el rol del usuario desde la base de datos
+        const { data: roleData, error } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .maybeSingle();
 
-      console.log("Datos de rol:", roleData, "Error:", error);
+        console.log("Datos de rol:", roleData, "Error:", error);
 
-      const userIsAdmin = roleData?.role === "admin";
-      console.log("Es admin?", userIsAdmin);
-      setIsAdmin(userIsAdmin);
-    } else {
+        const userIsAdmin = roleData?.role === "admin";
+        console.log("Es admin?", userIsAdmin);
+        setIsAdmin(userIsAdmin);
+      } else {
+        setUser(null);
+        setIsAdmin(false);
+      }
+    } catch (error) {
+      console.error("Error al verificar usuario:", error);
+      // Si falla la autenticación, continuar sin usuario
       setUser(null);
       setIsAdmin(false);
     }
   };
 
   const loadData = async () => {
-    const [projectsRes, configRes] = await Promise.all([
-      supabase
-        .from("projects")
-        .select("*")
-        .order("created_at", { ascending: false }),
-      supabase.from("page_config").select("*").maybeSingle(),
-    ]);
+    try {
+      const [projectsRes, configRes] = await Promise.all([
+        supabase
+          .from("projects")
+          .select("*")
+          .order("created_at", { ascending: false }),
+        supabase.from("page_config").select("*").maybeSingle(),
+      ]);
 
-    if (projectsRes.data) {
-      setProjects(projectsRes.data);
-      setFeaturedProjects(
-        projectsRes.data.filter((p) => p.is_featured).slice(0, 6)
-      );
-    }
+      if (projectsRes.error) {
+        console.error("Error al cargar proyectos:", projectsRes.error);
+        // No hay proyectos disponibles, pero la página puede cargar
+        setProjects([]);
+        setFeaturedProjects([]);
+      } else if (projectsRes.data) {
+        setProjects(projectsRes.data);
+        setFeaturedProjects(
+          projectsRes.data.filter((p) => p.is_featured).slice(0, 6)
+        );
+      }
 
-    if (configRes.data) {
-      setConfig(configRes.data);
+      if (configRes.error) {
+        console.error("Error al cargar configuración:", configRes.error);
+        // Usar configuración por defecto
+        setConfig({
+          id: "default",
+          hero_title: "REAL STACK",
+          hero_subtitle: "Desarrollos inmobiliarios de excelencia",
+          contact_email: "info@realstack.com",
+          contact_phone: "+54 9 221 444-5555",
+          maps_embed_url: "",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
+      } else if (configRes.data) {
+        setConfig(configRes.data);
+      }
+    } catch (error) {
+      console.error("Error de conexión con Supabase:", error);
+      // Establecer valores por defecto para que la página funcione sin conexión
+      setProjects([]);
+      setFeaturedProjects([]);
+      setConfig({
+        id: "default",
+        hero_title: "REAL STACK",
+        hero_subtitle: "Desarrollos inmobiliarios de excelencia",
+        contact_email: "info@realstack.com",
+        contact_phone: "+54 9 221 444-5555",
+        maps_embed_url: "",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
     }
   };
 

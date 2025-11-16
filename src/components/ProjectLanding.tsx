@@ -358,7 +358,10 @@ export default function ProjectLanding({
           {user && (
             <>
               <button
-                onClick={() => setShowAppointmentCalendar(true)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowAppointmentCalendar(true);
+                }}
                 className="flex items-center gap-2 border border-white bg-white px-4 py-4 md:px-6 text-neutral-900 shadow-lg transition-all hover:bg-neutral-900 hover:text-white"
               >
                 <CalendarClock className="h-6 w-6" strokeWidth={1.5} />

@@ -101,11 +101,11 @@ export default function ProjectDetails({
   };
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-4"
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-4 overflow-y-auto"
       onClick={onClose}
     >
       <div
-        className="relative max-h-[90vh] w-full max-w-5xl overflow-y-auto bg-white z-[10000]"
+        className="relative w-full max-w-5xl bg-white z-[10000] my-8"
         onClick={(e) => e.stopPropagation()}
       >
         <button

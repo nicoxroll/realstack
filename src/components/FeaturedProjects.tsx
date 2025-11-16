@@ -1,3 +1,4 @@
+import { Home } from "lucide-react";
 import { useState } from "react";
 import { Project } from "../lib/supabase";
 
@@ -13,6 +14,37 @@ export default function FeaturedProjects({
   onViewDetails,
 }: FeaturedProjectsProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+
+  if (projects.length === 0) {
+    return (
+      <section
+        id="featured-projects"
+        className="bg-neutral-50 px-6 py-24 md:px-12 lg:px-24 scroll-mt-20"
+      >
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-16 text-center">
+            <h2 className="mb-4 text-4xl font-light tracking-wide text-neutral-900 md:text-5xl">
+              Proyectos Destacados
+            </h2>
+            <div className="mx-auto h-px w-24 bg-neutral-400" />
+          </div>
+
+          <div className="flex flex-col items-center justify-center py-24">
+            <div className="mb-6 rounded-full bg-neutral-100 p-8">
+              <Home className="h-16 w-16 text-neutral-400" strokeWidth={1} />
+            </div>
+            <h3 className="mb-3 text-2xl font-light tracking-wide text-neutral-900">
+              No hay proyectos disponibles
+            </h3>
+            <p className="mb-8 max-w-md text-center font-light text-neutral-600">
+              Actualmente no hay proyectos destacados para mostrar. Por favor,
+              inténtalo más tarde.
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section

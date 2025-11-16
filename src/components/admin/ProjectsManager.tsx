@@ -94,7 +94,7 @@ export default function ProjectsManager({
     return (
       <div className="rounded-lg bg-white p-6 shadow-sm">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-light tracking-wide">
+          <h2 className="text-xl md:text-2xl font-light tracking-wide">
             {editingProject.id ? "Editar Proyecto" : "Nuevo Proyecto"}
           </h2>
           <button
@@ -205,7 +205,7 @@ export default function ProjectsManager({
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="mb-2 block text-sm font-light text-neutral-700">
                 Precio Desde (USD)
@@ -415,81 +415,99 @@ export default function ProjectsManager({
   return (
     <div className="rounded-lg bg-white p-6 shadow-sm">
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-light tracking-wide">Proyectos</h2>
+        <h2 className="text-xl md:text-2xl font-light tracking-wide">
+          Proyectos
+        </h2>
         <button
           onClick={handleCreate}
-          className="flex items-center gap-2 bg-neutral-900 px-6 py-3 text-sm tracking-wider text-white hover:bg-neutral-800"
+          className="flex items-center gap-2 bg-neutral-900 px-3 md:px-6 py-3 text-sm tracking-wider text-white hover:bg-neutral-800"
+          title="Nuevo proyecto"
         >
           <Plus className="h-4 w-4" strokeWidth={1.5} />
-          NUEVO PROYECTO
+          <span className="hidden md:inline">NUEVO PROYECTO</span>
         </button>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-neutral-200">
-              <th className="pb-3 text-left text-sm font-light text-neutral-600">
-                Nombre
-              </th>
-              <th className="pb-3 text-left text-sm font-light text-neutral-600">
-                Ubicación
-              </th>
-              <th className="pb-3 text-left text-sm font-light text-neutral-600">
-                Precio
-              </th>
-              <th className="pb-3 text-left text-sm font-light text-neutral-600">
-                Unidades
-              </th>
-              <th className="pb-3 text-left text-sm font-light text-neutral-600">
-                Estado
-              </th>
-              <th className="pb-3 text-left text-sm font-light text-neutral-600">
-                Destacado
-              </th>
-              <th className="pb-3 text-right text-sm font-light text-neutral-600">
-                Acciones
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {projects.map((project) => (
-              <tr key={project.id} className="border-b border-neutral-100">
-                <td className="py-4 text-sm font-light">{project.name}</td>
-                <td className="py-4 text-sm font-light text-neutral-600">
-                  {project.location}
-                </td>
-                <td className="py-4 text-sm font-light">
-                  ${project.price_from.toLocaleString()}
-                </td>
-                <td className="py-4 text-sm font-light">
-                  {project.units_available}/{project.total_units}
-                </td>
-                <td className="py-4 text-sm font-light">{project.status}</td>
-                <td className="py-4 text-sm font-light">
-                  {project.is_featured ? "Sí" : "No"}
-                </td>
-                <td className="py-4 text-right">
-                  <button
-                    onClick={() => handleEdit(project)}
-                    className="mr-2 p-2 hover:bg-neutral-100"
-                  >
-                    <Edit className="h-4 w-4" strokeWidth={1.5} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(project.id)}
-                    className="p-2 hover:bg-red-50"
-                  >
-                    <Trash2
-                      className="h-4 w-4 text-red-600"
-                      strokeWidth={1.5}
-                    />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="-mx-4 md:-mx-0">
+        <div className="overflow-x-auto">
+          <div className="inline-block min-w-full align-middle">
+            <table className="min-w-full divide-y divide-neutral-200 border border-neutral-200 rounded-lg overflow-hidden mx-4 md:mx-0">
+              <thead className="bg-neutral-50">
+                <tr>
+                  <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-light text-neutral-600">
+                    Nombre
+                  </th>
+                  <th className="hidden md:table-cell px-6 py-3 text-left text-sm font-light text-neutral-600">
+                    Ubicación
+                  </th>
+                  <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-light text-neutral-600">
+                    Precio
+                  </th>
+                  <th className="hidden sm:table-cell px-3 md:px-6 py-3 text-left text-xs md:text-sm font-light text-neutral-600">
+                    Unidades
+                  </th>
+                  <th className="hidden lg:table-cell px-6 py-3 text-left text-sm font-light text-neutral-600">
+                    Estado
+                  </th>
+                  <th className="hidden lg:table-cell px-6 py-3 text-left text-sm font-light text-neutral-600">
+                    Destacado
+                  </th>
+                  <th className="px-3 md:px-6 py-3 text-right text-xs md:text-sm font-light text-neutral-600">
+                    Acciones
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-neutral-100 bg-white">
+                {projects.map((project) => (
+                  <tr key={project.id}>
+                    <td className="px-3 md:px-6 py-3 text-xs md:text-sm font-light">
+                      <div className="max-w-[120px] md:max-w-none truncate">
+                        {project.name}
+                      </div>
+                    </td>
+                    <td className="hidden md:table-cell px-6 py-3 text-sm font-light text-neutral-600">
+                      {project.location}
+                    </td>
+                    <td className="px-3 md:px-6 py-3 text-xs md:text-sm font-light">
+                      ${project.price_from.toLocaleString()}
+                    </td>
+                    <td className="hidden sm:table-cell px-3 md:px-6 py-3 text-xs md:text-sm font-light">
+                      {project.units_available}/{project.total_units}
+                    </td>
+                    <td className="hidden lg:table-cell px-6 py-3 text-sm font-light">
+                      {project.status}
+                    </td>
+                    <td className="hidden lg:table-cell px-6 py-3 text-sm font-light">
+                      {project.is_featured ? "Sí" : "No"}
+                    </td>
+                    <td className="px-3 md:px-6 py-3 text-right">
+                      <div className="flex justify-end gap-1">
+                        <button
+                          onClick={() => handleEdit(project)}
+                          className="p-1.5 md:p-2 hover:bg-neutral-100"
+                        >
+                          <Edit
+                            className="h-3.5 w-3.5 md:h-4 md:w-4"
+                            strokeWidth={1.5}
+                          />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(project.id)}
+                          className="p-1.5 md:p-2 hover:bg-red-50"
+                        >
+                          <Trash2
+                            className="h-3.5 w-3.5 md:h-4 md:w-4 text-red-600"
+                            strokeWidth={1.5}
+                          />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
       {NotificationComponent}
       {ConfirmComponent}

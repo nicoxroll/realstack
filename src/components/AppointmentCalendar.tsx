@@ -108,15 +108,42 @@ export default function AppointmentCalendar({
     if (!selectedDate) return;
 
     const dateStr = selectedDate.toISOString().split("T")[0];
-    const { data } = await supabase
+
+    // Cargar citas de la tabla appointments
+    const { data: appointmentsData } = await supabase
       .from("appointments")
       .select("appointment_date, start_time")
       .eq("appointment_date", dateStr)
       .neq("status", "cancelled");
 
-    if (data) {
-      setExistingAppointments(data);
+    // Cargar también de user_visits (que son las reservas de turnos)
+    const { data: visitsData } = await supabase
+      .from("user_visits")
+      .select("visit_date, notes")
+      .eq("visit_date", dateStr)
+      .eq("status", "pending");
+
+    const allAppointments: ExistingAppointment[] = [];
+
+    // Agregar appointments
+    if (appointmentsData) {
+      allAppointments.push(...appointmentsData);
     }
+
+    // Agregar user_visits (extraer hora de las notas)
+    if (visitsData) {
+      visitsData.forEach((visit) => {
+        const timeMatch = visit.notes?.match(/(\d{2}:\d{2})/);
+        if (timeMatch) {
+          allAppointments.push({
+            appointment_date: visit.visit_date,
+            start_time: timeMatch[1] + ":00",
+          });
+        }
+      });
+    }
+
+    setExistingAppointments(allAppointments);
   };
 
   const generateAvailableSlots = () => {
@@ -323,11 +350,11 @@ export default function AppointmentCalendar({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 overflow-y-auto"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-4xl bg-white p-8"
+        className="relative w-full max-w-4xl bg-white p-8 my-8"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -436,17 +463,26 @@ export default function AppointmentCalendar({
                       key={slot}
                       onClick={() => !isDisabled && setSelectedTime(timeValue)}
                       disabled={isDisabled}
-                      className={`border p-3 text-sm font-light transition-all ${
+                      className={`border p-3 text-sm font-light transition-all relative ${
                         isDisabled
-                          ? "cursor-not-allowed border-neutral-200 bg-neutral-100 text-neutral-400 opacity-50"
+                          ? "cursor-not-allowed border-neutral-200 bg-neutral-50 text-neutral-300 line-through"
                           : selectedTime === timeValue
                           ? "border-neutral-900 bg-neutral-900 text-white"
-                          : "border-neutral-300 hover:border-neutral-900"
+                          : "border-neutral-300 hover:border-neutral-900 hover:bg-neutral-50"
                       }`}
                     >
-                      {timeValue}
+                      <span className={isDisabled ? "opacity-40" : ""}>
+                        {timeValue}
+                      </span>
                       {isBooked && (
-                        <span className="ml-1 text-xs">(Reservado)</span>
+                        <span className="block text-xs mt-1 opacity-50">
+                          Reservado
+                        </span>
+                      )}
+                      {isPast && (
+                        <span className="block text-xs mt-1 opacity-50">
+                          No disponible
+                        </span>
                       )}
                     </button>
                   );
