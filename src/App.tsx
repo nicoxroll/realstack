@@ -478,7 +478,6 @@ function App() {
             scrollToSection={scrollToSection}
           />
         )}
-
       </div>
     );
   }
