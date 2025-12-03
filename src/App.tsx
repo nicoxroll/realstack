@@ -8,7 +8,6 @@ import FeaturedProjects from "./components/FeaturedProjects";
 import Footer from "./components/Footer";
 import Hero from "./components/Hero";
 import Newsletter from "./components/Newsletter";
-import ProjectDetails from "./components/ProjectDetails";
 import ProjectLanding from "./components/ProjectLanding";
 import { PageConfig, Project, supabase } from "./lib/supabase";
 import Admin from "./pages/Admin";
@@ -29,7 +28,6 @@ function App() {
   const [view, setView] = useState<View>("home");
   const [projects, setProjects] = useState<Project[]>([]);
   const [featuredProjects, setFeaturedProjects] = useState<Project[]>([]);
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
     null
   );
@@ -171,15 +169,7 @@ function App() {
     }
   };
 
-  const handleViewDetails = (id: string) => {
-    const project = projects.find((p) => p.id === id);
-    if (project) {
-      setSelectedProject(project);
-    }
-  };
-
   const handleViewMore = (id: string) => {
-    setSelectedProject(null);
     setSelectedProjectId(id);
     setView("project-landing");
     (window as any).lenis?.scrollTo(0, { immediate: true });
@@ -479,7 +469,7 @@ function App() {
           )}
         </nav>
 
-        <AllProjects projects={projects} onViewDetails={handleViewDetails} />
+        <AllProjects projects={projects} onViewDetails={handleViewMore} />
 
         {config && (
           <Footer
@@ -489,13 +479,6 @@ function App() {
           />
         )}
 
-        {selectedProject && (
-          <ProjectDetails
-            project={selectedProject}
-            onClose={() => setSelectedProject(null)}
-            onViewMore={() => handleViewMore(selectedProject.id)}
-          />
-        )}
       </div>
     );
   }
@@ -701,7 +684,7 @@ function App() {
             <FeaturedProjects
               projects={featuredProjects}
               onViewAll={handleViewAll}
-              onViewDetails={handleViewDetails}
+              onViewDetails={handleViewMore}
             />
           )}
 
@@ -721,14 +704,6 @@ function App() {
             scrollToSection={scrollToSection}
           />
         </>
-      )}
-
-      {selectedProject && (
-        <ProjectDetails
-          project={selectedProject}
-          onClose={() => setSelectedProject(null)}
-          onViewMore={() => handleViewMore(selectedProject.id)}
-        />
       )}
     </div>
   );
